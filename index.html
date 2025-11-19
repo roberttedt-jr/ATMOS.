@@ -2,8 +2,16 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Atmos | Tu Clima</title>
+    
+    <!-- PWA Settings -->
+    <meta name="theme-color" content="#4facfe">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1163/1163661.png" type="image/png">
+
+    <!-- Librerías -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600;800&display=swap" rel="stylesheet">
@@ -23,11 +31,11 @@
     </script>
 
     <style>
-        /* Transiciones de fondo */
+        /* --- ESTILOS GLOBALES --- */
         body {
-            transition: background-image 1s ease-in-out, background-color 1s ease-in-out;
+            transition: background-image 1.5s ease-in-out, background-color 1.5s ease-in-out;
             background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            animation: gradientBG 20s ease infinite;
             color: white;
             min-height: 100vh;
             height: 100vh;
@@ -36,6 +44,18 @@
             align-items: center;
             justify-content: center;
             width: 100%;
+            overflow: hidden; 
+            overscroll-behavior-y: none;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
         }
 
         @keyframes gradientBG {
@@ -44,164 +64,183 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Fondos según el clima */
-        .bg-sunny { background: linear-gradient(-45deg, #2980B9, #6DD5FA, #FFFFFF); } 
-        .bg-cloudy { background: linear-gradient(-45deg, #757F9A, #D7DDE8); } 
-        .bg-rainy { background: linear-gradient(-45deg, #373B44, #4286f4); } 
-        .bg-night { background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e); } 
-        .bg-storm { background: linear-gradient(-45deg, #232526, #414345); } 
+        /* Paletas */
+        .bg-sunny { background: linear-gradient(-45deg, #4facfe, #00f2fe, #43e97b); } 
+        .bg-cloudy { background: linear-gradient(-45deg, #5D6D7E, #BFC9CA, #85929E); } 
+        .bg-rainy { background: linear-gradient(-45deg, #2c3e50, #2980b9, #2c3e50); } 
+        .bg-night { background: linear-gradient(-45deg, #0b1021, #1b2735, #090a0f); } 
+        .bg-storm { background: linear-gradient(-45deg, #232526, #414345, #2c3e50); } 
+        .bg-sunrise { background: linear-gradient(-45deg, #ff9a9e, #fecfef, #a18cd1); }
+        .bg-sunset { background: linear-gradient(-45deg, #ff758c, #ff7eb3, #2c3e50); }
 
-        .custom-scroll::-webkit-scrollbar { height: 4px; }
-        .custom-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 10px; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .weather-effect { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
-        
-        .rain { position: absolute; width: 2px; height: 20px; background: rgba(255,255,255,0.4); top: -20px; animation: fall linear infinite; }
-        @keyframes fall { to { transform: translateY(105vh); } }
-
-        .cloud { position: absolute; opacity: 0.3; animation: floatCloud linear infinite; }
+        /* Efectos */
+        .weather-effect { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .rain { position: absolute; width: 1px; height: 25px; background: rgba(255,255,255,0.3); top: -20px; animation: fall linear infinite; }
+        @keyframes fall { to { transform: translateY(120vh); } }
+        .cloud { position: absolute; opacity: 0.4; animation: floatCloud linear infinite; }
         @keyframes floatCloud { from { transform: translateX(-100%); } to { transform: translateX(100vw); } }
-        
         .star { position: absolute; background: white; border-radius: 50%; animation: twinkle infinite alternate; }
         @keyframes twinkle { from { opacity: 0.3; } to { opacity: 1; } }
-
         .sun-glow {
-            position: absolute; top: -100px; right: -100px; width: 300px; height: 300px;
-            background: radial-gradient(circle, rgba(255,215,0,0.4) 0%, rgba(255,255,255,0) 70%);
-            border-radius: 50%; opacity: 0.8; animation: pulseSun 6s infinite ease-in-out;
+            position: absolute; top: -150px; right: -150px; width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%; opacity: 0.8; animation: pulseSun 8s infinite ease-in-out;
         }
         @keyframes pulseSun { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-
-        /* Logo animado */
         .logo-dot { animation: pulse 2s infinite; }
 
+        /* Modales */
         #detailModal { transition: opacity 0.3s ease, transform 0.3s ease; }
         .modal-open { opacity: 1; pointer-events: auto; transform: scale(1); }
         .modal-closed { opacity: 0; pointer-events: none; transform: scale(0.95); }
+
+        /* --- MÁSCARA CORREGIDA --- */
+        /* La zona transparente superior (0px a 120px) asegura que el contenido desaparezca antes de tocar el header */
+        .fade-mask-top {
+            mask-image: linear-gradient(to bottom, transparent 0px, transparent 120px, black 160px, black calc(100% - 40px), transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0px, transparent 120px, black 160px, black calc(100% - 40px), transparent 100%);
+        }
     </style>
 </head>
-<body class="bg-sunny p-0 md:p-4 relative">
+<body class="bg-sunny relative">
 
-    <!-- Capa de Efectos -->
     <div id="weatherEffects" class="weather-effect fixed inset-0"></div>
 
-    <!-- Contenedor Principal -->
-    <div class="w-full h-screen md:h-[850px] md:w-[400px] bg-glass backdrop-blur-2xl md:rounded-[3rem] shadow-2xl relative overflow-hidden flex flex-col border border-white/20 z-10 text-center mx-auto flex-none">
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="w-full h-full md:h-[90vh] md:max-h-[850px] md:w-[400px] bg-glass backdrop-blur-2xl md:rounded-[3rem] shadow-2xl relative overflow-hidden flex flex-col border border-white/20 z-10 text-center mx-auto flex-none ring-1 ring-white/10">
         
-        <!-- Header con Logo ATMOS -->
-        <div class="pt-8 px-6 flex justify-between items-center z-20 w-full mb-2">
-            <button onclick="toggleFavorites()" class="text-white/80 hover:text-white transition p-2"><i class="fas fa-bars text-xl"></i></button>
+        <!-- HEADER FLOTANTE -->
+        <!-- Eliminado el fondo oscuro para confiar 100% en la máscara de abajo -->
+        <div class="absolute top-0 left-0 w-full z-30 pt-8 pb-4 px-6 flex justify-between items-center pointer-events-none">
+            <button onclick="toggleFavorites()" class="text-white/90 hover:text-white transition p-2 bg-white/10 rounded-full backdrop-blur-md shadow-sm pointer-events-auto"><i class="fas fa-bars text-sm"></i></button>
             
-            <!-- LOGO -->
-            <div class="flex items-center justify-center gap-1 tracking-widest flex-1 select-none">
-                <i class="fas fa-wind text-xl opacity-80"></i>
-                <span class="font-bold text-2xl tracking-[0.2em] uppercase">Atmos</span>
-                <div class="w-1.5 h-1.5 bg-white rounded-full logo-dot mt-2"></div>
+            <div class="flex items-center justify-center gap-1 tracking-widest flex-1 select-none text-white pointer-events-auto">
+                <i class="fas fa-wind text-xl opacity-90"></i>
+                <span class="font-bold text-2xl tracking-[0.2em] uppercase drop-shadow-md">Atmos</span>
+                <div class="w-1.5 h-1.5 bg-white rounded-full logo-dot mt-2 shadow-lg"></div>
             </div>
             
-            <button onclick="toggleSearch()" class="text-white/80 hover:text-white transition p-2"><i class="fas fa-search text-xl"></i></button>
+            <button onclick="toggleSearch()" class="text-white/90 hover:text-white transition p-2 bg-white/10 rounded-full backdrop-blur-md shadow-sm pointer-events-auto"><i class="fas fa-search text-sm"></i></button>
         </div>
 
-        <!-- Buscador -->
-        <div id="searchBar" class="hidden absolute top-20 left-0 w-full px-6 z-30 animate-fade-in-down">
-            <form onsubmit="event.preventDefault(); searchCity();" class="flex gap-2 justify-center">
-                <input type="text" id="searchInput" placeholder="Busca una ciudad..." class="w-full bg-black/40 backdrop-blur-md border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/50 outline-none text-center font-medium">
-            </form>
+        <!-- BUSCADOR -->
+        <div id="searchBar" class="hidden absolute top-24 left-0 w-full px-6 z-40 animate-fade-in-down">
+            <div class="relative">
+                <form onsubmit="event.preventDefault(); searchCity();" class="flex gap-2 justify-center relative z-10">
+                    <input type="text" id="searchInput" placeholder="Busca una ciudad..." class="w-full bg-black/70 backdrop-blur-xl border border-white/20 rounded-2xl px-4 py-4 text-white placeholder-white/50 outline-none text-center font-medium shadow-2xl" autocomplete="off">
+                </form>
+                <div id="suggestionsList" class="hidden absolute top-full left-0 w-full bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl mt-2 overflow-hidden z-50 shadow-2xl max-h-60 overflow-y-auto hide-scroll text-left"></div>
+            </div>
         </div>
 
-        <!-- Panel Favoritos -->
-        <div id="favoritesPanel" class="absolute inset-y-0 left-0 w-3/4 bg-black/80 backdrop-blur-xl z-40 transform -translate-x-full transition-transform duration-300 p-6 text-left border-r border-white/10">
-            <div class="flex justify-between items-center mb-8">
+        <!-- PANEL FAVORITOS -->
+        <div id="favoritesPanel" class="absolute inset-y-0 left-0 w-3/4 bg-black/90 backdrop-blur-xl z-50 transform -translate-x-full transition-transform duration-300 p-6 text-left border-r border-white/10">
+            <div class="flex justify-between items-center mb-8 mt-6">
                 <h2 class="text-xl font-bold tracking-wide">MIS LUGARES</h2>
                 <button onclick="toggleFavorites()"><i class="fas fa-times text-lg"></i></button>
             </div>
             <div id="favoritesList" class="space-y-3"></div>
-            <button onclick="addToFavorites()" class="mt-6 w-full py-3 rounded-xl border border-white/20 hover:bg-white/10 transition flex items-center justify-center gap-2 text-sm font-bold">
+            <button onclick="addToFavorites()" class="mt-6 w-full py-3 rounded-xl border border-white/20 hover:bg-white/10 transition flex items-center justify-center gap-2 text-sm font-bold shadow-lg">
                 <i class="fas fa-plus"></i> Guardar ubicación
             </button>
         </div>
 
-        <!-- Scrollable Content -->
-        <div class="flex-1 overflow-y-auto custom-scroll pb-4 relative z-10 w-full">
+        <!-- CONTENIDO SCROLLABLE (Con máscara más agresiva) -->
+        <div class="h-full w-full overflow-y-auto hide-scroll pt-36 pb-28 px-0 fade-mask-top">
             
-            <!-- Main Weather -->
-            <div class="flex flex-col items-center justify-center mt-4 mb-8 text-center px-4 w-full">
-                
-                <!-- Ciudad (Movida aquí para protagonismo) -->
-                <div class="flex items-center gap-2 text-white/90 mb-2">
+            <!-- 1. TIEMPO PRINCIPAL -->
+            <div class="flex flex-col items-center justify-center mb-8 text-center px-4 w-full">
+                <div class="flex items-center gap-2 text-white/90 mb-4 bg-white/10 px-4 py-1.5 rounded-full backdrop-blur-sm border border-white/5 shadow-sm cursor-pointer hover:bg-white/20 transition" onclick="toggleSearch()">
                     <i class="fas fa-location-arrow text-xs opacity-70"></i>
-                    <h2 id="cityName" class="text-xl font-semibold tracking-wide">Localizando...</h2>
+                    <h2 id="cityName" class="text-sm font-bold tracking-wide uppercase">Localizando...</h2>
                 </div>
-
-                <div id="mainIcon" class="text-8xl mb-2 drop-shadow-2xl filter animate-pulse flex justify-center transform scale-90">
+                <div id="mainIcon" class="text-8xl mb-2 drop-shadow-2xl filter animate-pulse flex justify-center transform scale-110 mt-2">
                     <i class="fas fa-spinner fa-spin text-4xl"></i>
                 </div>
-                <h1 id="currentTemp" class="text-9xl font-extralight tracking-tighter text-center w-full drop-shadow-lg pl-4">--°</h1>
-                <p id="weatherDesc" class="text-xl font-medium capitalize opacity-90 mt-0 text-center w-full">Cargando...</p>
-                <div class="flex justify-center gap-6 mt-2 text-sm font-medium opacity-80 w-full">
-                    <span>Min: <span id="minTemp">--</span>°</span>
-                    <span>Max: <span id="maxTemp">--</span>°</span>
+                <h1 id="currentTemp" class="text-[110px] font-extralight tracking-tighter leading-none text-center w-full drop-shadow-lg pl-4">--°</h1>
+                <p id="weatherDesc" class="text-lg font-medium capitalize opacity-80 mt-0 text-center w-full drop-shadow-sm">Cargando...</p>
+                <div class="flex justify-center gap-8 mt-4 text-sm font-bold opacity-90 w-full">
+                    <span class="flex flex-col items-center"><span class="text-[10px] opacity-60 uppercase">Min</span> <span id="minTemp">--°</span></span>
+                    <div class="w-px h-8 bg-white/20"></div>
+                    <span class="flex flex-col items-center"><span class="text-[10px] opacity-60 uppercase">Max</span> <span id="maxTemp">--°</span></span>
                 </div>
             </div>
 
-            <!-- Grid de Datos -->
-            <div class="grid grid-cols-3 gap-3 px-6 mb-8 w-full">
-                <div class="bg-glass rounded-2xl p-3 flex flex-col items-center justify-center border border-white/10 hover:bg-white/10 transition">
-                    <i class="fas fa-wind mb-1 opacity-70"></i>
-                    <p id="windSpeed" class="font-bold text-lg">--</p>
-                    <p class="text-[10px] uppercase opacity-60 font-bold">Viento</p>
+            <!-- 2. GRID DE DATOS -->
+            <div class="grid grid-cols-3 gap-3 px-6 mb-10 w-full">
+                <div class="bg-glass rounded-2xl p-3 flex flex-col items-center justify-center border border-white/10 hover:bg-white/10 transition shadow-lg backdrop-blur-md group">
+                    <i class="fas fa-wind mb-2 opacity-70 text-xl group-hover:text-cyan-300 transition"></i>
+                    <p id="windSpeed" class="font-bold text-lg leading-none">--</p>
+                    <p class="text-[9px] uppercase opacity-60 font-bold tracking-widest mt-1">Viento</p>
                 </div>
-                <div class="bg-glass rounded-2xl p-3 flex flex-col items-center justify-center border border-white/10 hover:bg-white/10 transition">
-                    <i class="fas fa-tint mb-1 opacity-70"></i>
-                    <p id="humidity" class="font-bold text-lg">--</p>
-                    <p class="text-[10px] uppercase opacity-60 font-bold">Humedad</p>
+                <div class="bg-glass rounded-2xl p-3 flex flex-col items-center justify-center border border-white/10 hover:bg-white/10 transition shadow-lg backdrop-blur-md group">
+                    <i class="fas fa-tint mb-2 opacity-70 text-xl group-hover:text-blue-300 transition"></i>
+                    <p id="humidity" class="font-bold text-lg leading-none">--</p>
+                    <p class="text-[9px] uppercase opacity-60 font-bold tracking-widest mt-1">Humedad</p>
                 </div>
-                <!-- LLUVIA -->
-                <div class="bg-glass rounded-2xl p-3 flex flex-col items-center justify-center border border-white/10 hover:bg-white/10 transition">
-                    <i class="fas fa-umbrella mb-1 opacity-70"></i>
-                    <div class="text-center leading-tight">
+                <div class="bg-glass rounded-2xl p-3 flex flex-col items-center justify-center border border-white/10 hover:bg-white/10 transition shadow-lg backdrop-blur-md group">
+                    <i class="fas fa-umbrella mb-2 opacity-70 text-xl group-hover:text-purple-300 transition"></i>
+                    <div class="text-center leading-none">
                         <p id="rainProb" class="font-bold text-lg">--</p>
-                        <p id="rainAmt" class="text-[10px] opacity-80">-- mm</p>
+                        <p id="rainAmt" class="text-[9px] opacity-80 mt-0.5">-- mm</p>
                     </div>
-                    <p class="text-[10px] uppercase opacity-60 font-bold mt-1">Lluvia</p>
+                    <p class="text-[9px] uppercase opacity-60 font-bold tracking-widest mt-1">Lluvia</p>
+                </div>
+                
+                <!-- Segunda Fila -->
+                <div class="bg-glass rounded-2xl p-3 flex flex-col items-center justify-center border border-white/10 hover:bg-white/10 transition shadow-lg backdrop-blur-md group">
+                    <i class="fas fa-lungs mb-2 opacity-70 text-xl group-hover:text-green-300 transition"></i>
+                    <p id="aqiDisplay" class="font-bold text-lg leading-none">--</p>
+                    <p class="text-[9px] uppercase opacity-60 font-bold tracking-widest mt-1">Aire (AQI)</p>
+                </div>
+                <div class="bg-glass rounded-2xl p-3 flex flex-col items-center justify-center border border-white/10 hover:bg-white/10 transition shadow-lg backdrop-blur-md group">
+                    <i class="fas fa-sun mb-2 opacity-70 text-xl group-hover:text-yellow-300 transition"></i>
+                    <p id="uvDisplay" class="font-bold text-lg leading-none">--</p>
+                    <p class="text-[9px] uppercase opacity-60 font-bold tracking-widest mt-1">Indice UV</p>
+                </div>
+                <div class="bg-glass rounded-2xl p-3 flex flex-col items-center justify-center border border-white/10 hover:bg-white/10 transition shadow-lg backdrop-blur-md group">
+                    <i id="sunIcon" class="fas fa-mountain-sun mb-2 opacity-70 text-xl group-hover:text-orange-300 transition"></i>
+                    <p id="sunTime" class="font-bold text-lg leading-none">--</p>
+                    <p id="sunLabel" class="text-[9px] uppercase opacity-60 font-bold tracking-widest mt-1">Sol</p>
                 </div>
             </div>
 
-            <!-- Horas -->
-            <div class="px-6 mb-8 w-full">
-                <div class="flex justify-between items-end mb-4 px-1">
-                    <h3 class="font-semibold opacity-90 tracking-wide">HOY</h3>
+            <!-- 3. HORAS -->
+            <div class="px-6 mb-10 w-full">
+                <div class="flex justify-between items-end mb-4 px-2">
+                    <h3 class="font-bold opacity-90 tracking-widest text-xs uppercase">Hoy</h3>
                 </div>
-                <div id="hourlyForecast" class="flex gap-3 overflow-x-auto custom-scroll pb-4 items-center pl-1">
-                    <!-- JS -->
-                </div>
+                <div id="hourlyForecast" class="flex gap-3 overflow-x-auto hide-scroll pb-2 items-center pl-1"></div>
             </div>
 
-            <!-- Días -->
-            <div class="px-6 w-full mb-8">
-                <h3 class="font-semibold opacity-90 mb-4 text-left px-1 tracking-wide"><i class="far fa-calendar-alt mr-2"></i>7 DÍAS</h3>
-                <div id="dailyForecast" class="bg-glass rounded-3xl p-2 space-y-1 w-full border border-white/5">
-                    <!-- JS -->
-                </div>
+            <!-- 4. DÍAS -->
+            <div class="px-6 w-full mb-10">
+                <h3 class="font-bold opacity-90 mb-4 text-left px-2 tracking-widest text-xs uppercase"><i class="far fa-calendar-alt mr-2"></i>Próximos 7 Días</h3>
+                <div id="dailyForecast" class="bg-glass rounded-3xl p-2 space-y-1 w-full border border-white/5 shadow-inner backdrop-blur-md"></div>
             </div>
             
-            <!-- CREDITOS -->
-            <div class="px-6 pb-6 text-center opacity-40 hover:opacity-100 transition-opacity duration-300">
-                <p class="text-[10px] font-mono uppercase tracking-widest mb-1">Fuente de datos</p>
-                <p class="text-xs font-bold mb-3"><a href="https://open-meteo.com/" target="_blank" class="hover:underline hover:text-white transition-colors">Open-Meteo API</a></p>
+            <!-- 6. CRÉDITOS -->
+            <div class="px-6 pb-10 text-center opacity-40 hover:opacity-100 transition-opacity duration-300 relative z-20 pointer-events-auto">
+                <p class="text-[10px] font-mono uppercase tracking-widest mb-1">Datos via</p>
+                <a href="https://open-meteo.com/" target="_blank" class="text-xs font-bold mb-3 hover:underline hover:text-white transition-colors cursor-pointer inline-block relative z-50 p-2">Open-Meteo API</a>
                 <div class="h-px w-12 bg-white/30 mx-auto mb-3"></div>
-                <p class="text-[10px]">Desarrollado por <span class="font-bold">Roberto Muñoz</span></p>
+                <p class="text-[10px]">Desarrollado por <span class="font-bold text-white">Roberto Muñoz</span></p>
             </div>
         </div>
+        
+        <!-- MÁSCARA INFERIOR -->
+        <div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-black/40 to-transparent pointer-events-none z-10 rounded-b-[3rem]"></div>
 
-        <!-- MODAL -->
-        <div id="detailModal" class="absolute inset-0 z-50 flex items-center justify-center p-4 modal-closed bg-black/60 backdrop-blur-sm">
-            <div class="bg-slate-900/90 border border-white/20 text-white w-full max-w-sm rounded-3xl p-6 shadow-2xl relative transform transition-all">
-                <button onclick="closeModal()" class="absolute top-4 right-4 text-white/50 hover:text-white">
-                    <i class="fas fa-times text-xl"></i>
+        <!-- MODAL DETALLES -->
+        <div id="detailModal" class="absolute inset-0 z-50 flex items-center justify-center p-6 modal-closed bg-black/40 backdrop-blur-md rounded-[3rem]">
+            <div class="bg-slate-900/95 border border-white/20 text-white w-full max-w-sm rounded-3xl p-8 shadow-2xl relative transform transition-all flex flex-col items-center text-center ring-1 ring-white/10">
+                <button onclick="closeModal()" class="absolute top-5 right-5 w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition">
+                    <i class="fas fa-times text-sm"></i>
                 </button>
-                <div id="modalContent"></div>
+                <div id="modalContent" class="w-full"></div>
             </div>
         </div>
 
@@ -210,22 +249,24 @@
     <script>
         const API_GEO = "https://geocoding-api.open-meteo.com/v1/search";
         const API_WEATHER = "https://api.open-meteo.com/v1/forecast";
+        const API_AIR = "https://air-quality-api.open-meteo.com/v1/air-quality";
 
         const weatherTypes = {
-            0: { icon: 'fa-sun', bg: 'bg-sunny', name: 'Despejado' },
-            1: { icon: 'fa-cloud-sun', bg: 'bg-sunny', name: 'Mayormente Claro' },
-            2: { icon: 'fa-cloud-sun', bg: 'bg-cloudy', name: 'Parcialmente Nublado' },
-            3: { icon: 'fa-cloud', bg: 'bg-cloudy', name: 'Nublado' },
-            45: { icon: 'fa-smog', bg: 'bg-cloudy', name: 'Niebla' },
-            51: { icon: 'fa-cloud-rain', bg: 'bg-rainy', name: 'Llovizna' },
-            61: { icon: 'fa-cloud-showers-heavy', bg: 'bg-rainy', name: 'Lluvia' },
-            80: { icon: 'fa-cloud-showers-water', bg: 'bg-rainy', name: 'Chubascos' },
-            95: { icon: 'fa-bolt', bg: 'bg-storm', name: 'Tormenta' }
+            0: { icon: 'fa-sun', name: 'Despejado' },
+            1: { icon: 'fa-cloud-sun', name: 'Mayormente Claro' },
+            2: { icon: 'fa-cloud-sun', name: 'Parcialmente Nublado' },
+            3: { icon: 'fa-cloud', name: 'Nublado' },
+            45: { icon: 'fa-smog', name: 'Niebla' },
+            51: { icon: 'fa-cloud-rain', name: 'Llovizna' },
+            61: { icon: 'fa-cloud-showers-heavy', name: 'Lluvia' },
+            80: { icon: 'fa-cloud-showers-water', name: 'Chubascos' },
+            95: { icon: 'fa-bolt', name: 'Tormenta' }
         };
 
         let globalData = null;
         let currentCityData = null;
         let favorites = JSON.parse(localStorage.getItem('weatherFavs')) || [];
+        let searchTimeout;
 
         window.onload = () => {
             loadFavorites();
@@ -237,33 +278,67 @@
             } else {
                 fetchData(40.4165, -3.7026, "Madrid");
             }
+
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                const query = e.target.value.trim();
+                clearTimeout(searchTimeout);
+                if(query.length < 3) {
+                    document.getElementById('suggestionsList').classList.add('hidden');
+                    return;
+                }
+                searchTimeout = setTimeout(() => { fetchSuggestions(query); }, 300);
+            });
         };
 
-        async function fetchData(lat, lon, cityNameOverride = null) {
+        async function fetchSuggestions(query) {
             try {
-                let displayName = cityNameOverride || "Ubicación";
-                const url = `${API_WEATHER}?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,is_day,weather_code,wind_speed_10m,visibility,precipitation_probability,precipitation&hourly=temperature_2m,weather_code,is_day,precipitation_probability,apparent_temperature,relative_humidity_2m,wind_speed_10m,pressure_msl&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,precipitation_probability_max&timezone=auto`;
-                
-                const res = await fetch(url);
+                const res = await fetch(`${API_GEO}?name=${query}&count=5&language=es&format=json`);
                 const data = await res.json();
-                globalData = data; 
-                currentCityData = { name: displayName, lat, lon };
-                updateUI(data, displayName);
-            } catch (error) { console.error("Error API", error); }
+                const list = document.getElementById('suggestionsList');
+                list.innerHTML = '';
+                if(data.results) {
+                    data.results.forEach(city => {
+                        const div = document.createElement('div');
+                        div.className = "p-4 hover:bg-white/10 cursor-pointer flex justify-between items-center border-b border-white/5 last:border-0 transition";
+                        div.innerHTML = `<div><span class="font-bold text-sm block">${city.name}</span><span class="text-[10px] opacity-60 block uppercase tracking-wide">${city.admin1 || ''}, ${city.country}</span></div><i class="fas fa-chevron-right text-xs opacity-40"></i>`;
+                        div.onclick = () => selectSuggestion(city);
+                        list.appendChild(div);
+                    });
+                    list.classList.remove('hidden');
+                } else { list.classList.add('hidden'); }
+            } catch(e) { console.error(e); }
+        }
+
+        function selectSuggestion(city) {
+            document.getElementById('searchInput').value = city.name;
+            document.getElementById('suggestionsList').classList.add('hidden');
+            toggleSearch(); 
+            fetchData(city.latitude, city.longitude, city.name);
         }
 
         async function searchCity() {
             const query = document.getElementById('searchInput').value;
             if(!query) return;
-            toggleSearch(); 
+            fetchSuggestions(query).then(() => {
+                const first = document.querySelector('#suggestionsList > div');
+                if(first) first.click();
+            });
+        }
+
+        async function fetchData(lat, lon, cityNameOverride = null) {
             try {
-                const res = await fetch(`${API_GEO}?name=${query}&count=1&language=es&format=json`);
-                const data = await res.json();
-                if(data.results) {
-                    const { latitude, longitude, name, country } = data.results[0];
-                    fetchData(latitude, longitude, `${name}, ${country}`);
-                } else { alert("Ciudad no encontrada"); }
-            } catch (e) { alert("Error búsqueda"); }
+                let displayName = cityNameOverride || "Ubicación";
+                const weatherUrl = `${API_WEATHER}?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,is_day,weather_code,wind_speed_10m,visibility,precipitation_probability,precipitation&hourly=temperature_2m,weather_code,is_day,precipitation_probability,apparent_temperature,relative_humidity_2m,wind_speed_10m,pressure_msl&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,precipitation_probability_max&timezone=auto`;
+                const airUrl = `${API_AIR}?latitude=${lat}&longitude=${lon}&current=european_aqi`;
+
+                const [weatherRes, airRes] = await Promise.all([fetch(weatherUrl), fetch(airUrl)]);
+                const weatherData = await weatherRes.json();
+                const airData = await airRes.json();
+
+                globalData = { ...weatherData, aqi: airData.current ? airData.current.european_aqi : null };
+                currentCityData = { name: displayName, lat, lon };
+                updateUI(globalData, displayName);
+            } catch (error) { console.error("Error API", error); }
         }
 
         function updateUI(data, cityName) {
@@ -272,21 +347,61 @@
             
             document.getElementById('cityName').innerText = cityName;
             document.getElementById('currentTemp').innerText = Math.round(current.temperature_2m) + "°";
-            document.getElementById('minTemp').innerText = Math.round(daily.temperature_2m_min[0]);
-            document.getElementById('maxTemp').innerText = Math.round(daily.temperature_2m_max[0]);
+            document.getElementById('minTemp').innerText = Math.round(daily.temperature_2m_min[0]) + "°";
+            document.getElementById('maxTemp').innerText = Math.round(daily.temperature_2m_max[0]) + "°";
             document.getElementById('windSpeed').innerText = current.wind_speed_10m + " km/h";
             document.getElementById('humidity').innerText = current.relative_humidity_2m + "%";
             document.getElementById('rainProb').innerText = daily.precipitation_probability_max[0] + "%";
             const rainAmount = current.precipitation || 0; 
             document.getElementById('rainAmt').innerText = rainAmount + " mm";
+            
+            document.getElementById('uvDisplay').innerText = Math.round(daily.uv_index_max[0]);
+            const aqi = data.aqi;
+            document.getElementById('aqiDisplay').innerText = aqi !== null ? aqi : "--";
+            
+            const now = new Date();
+            const sunrise = new Date(daily.sunrise[0]);
+            const sunset = new Date(daily.sunset[0]);
+            let sunTimeStr = "--:--";
+            let sunLabel = "Sol";
+            
+            if (now < sunrise) {
+                sunTimeStr = sunrise.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                sunLabel = "Amanecer";
+            } else if (now < sunset) {
+                sunTimeStr = sunset.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                sunLabel = "Atardecer";
+            } else {
+                 const sunriseTomorrow = new Date(daily.sunrise[1]);
+                 sunTimeStr = sunriseTomorrow.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                 sunLabel = "Amanecer";
+            }
+            document.getElementById('sunTime').innerText = sunTimeStr;
+            document.getElementById('sunLabel').innerText = sunLabel;
 
             const code = current.weather_code;
-            const isDay = current.is_day;
             const info = weatherTypes[code] || weatherTypes[0];
             document.getElementById('weatherDesc').innerText = info.name;
+
+            const margin = 45 * 60 * 1000; 
+            let bgClass = 'bg-night';
+            let isDay = true;
+
+            if (now >= sunrise - margin && now <= sunrise + margin) bgClass = 'bg-sunrise';
+            else if (now >= sunset - margin && now <= sunset + margin) bgClass = 'bg-sunset';
+            else if (now > sunrise + margin && now < sunset - margin) {
+                if (code >= 95 || (code >= 61 && code <= 65)) bgClass = 'bg-storm';
+                else if (code >= 51 || code === 45 || code === 3) bgClass = 'bg-cloudy';
+                else bgClass = 'bg-sunny';
+            } else {
+                isDay = false;
+                bgClass = 'bg-night';
+            }
+            document.body.className = `${bgClass} p-0 md:p-4 relative`;
+
             const iconClass = isDay ? info.icon : (code === 0 ? 'fa-moon' : info.icon);
-            document.getElementById('mainIcon').innerHTML = `<i class="fas ${iconClass}"></i>`;
-            document.body.className = isDay ? info.bg : 'bg-night';
+            const iconColor = isDay ? 'text-white' : 'text-blue-100';
+            document.getElementById('mainIcon').innerHTML = `<i class="fas ${iconClass} ${iconColor}"></i>`;
             
             renderEffects(code, isDay);
             renderHourly(data.hourly);
@@ -302,11 +417,11 @@
                 const temp = Math.round(hourly.temperature_2m[i]);
                 const hCode = hourly.weather_code[i];
                 const hIcon = (weatherTypes[hCode] || weatherTypes[0]).icon;
-                const timeStr = hourly.time[i].split('T')[1]; 
+                const timeStr = hourly.time[i].split('T')[1].substring(0, 5); 
                 container.innerHTML += `
-                    <div onclick="openHourlyModal(${i})" class="flex flex-col items-center justify-center min-w-[70px] bg-glass p-3 rounded-2xl border border-white/10 snap-center cursor-pointer hover:bg-white/20 transition active:scale-95">
-                        <span class="text-xs opacity-70 mb-2 font-bold">${timeStr}</span>
-                        <i class="fas ${hIcon} text-xl mb-2 drop-shadow-md"></i>
+                    <div onclick="openHourlyModal(${i})" class="flex flex-col items-center justify-center min-w-[70px] bg-glass p-3 rounded-2xl border border-white/10 snap-center cursor-pointer hover:bg-white/20 transition active:scale-95 backdrop-blur-sm shadow-md">
+                        <span class="text-xs opacity-60 mb-3 font-bold">${timeStr}</span>
+                        <i class="fas ${hIcon} text-xl mb-3 drop-shadow-sm"></i>
                         <span class="font-bold text-lg">${temp}°</span>
                     </div>
                 `;
@@ -318,20 +433,26 @@
             container.innerHTML = '';
             for(let i = 0; i < 7; i++) {
                 const date = new Date(daily.time[i]);
-                const dayName = i === 0 ? 'Hoy' : date.toLocaleDateString('es-ES', { weekday: 'long' });
+                let dayName;
+                if (i === 0) dayName = 'Hoy';
+                else if (i === 1) dayName = 'Mañana';
+                else {
+                    dayName = date.toLocaleDateString('es-ES', { weekday: 'long' });
+                    dayName = dayName.charAt(0).toUpperCase() + dayName.slice(1);
+                }
                 const dCode = daily.weather_code[i];
                 const dIcon = (weatherTypes[dCode] || weatherTypes[0]).icon;
                 const max = Math.round(daily.temperature_2m_max[i]);
                 const min = Math.round(daily.temperature_2m_min[i]);
                 container.innerHTML += `
-                    <div onclick="openDailyModal(${i})" class="flex justify-between items-center p-3 px-4 hover:bg-white/10 rounded-2xl transition cursor-pointer active:scale-95">
-                        <span class="w-24 capitalize font-medium text-left">${dayName}</span>
+                    <div onclick="openDailyModal(${i})" class="flex justify-between items-center p-4 hover:bg-white/5 rounded-2xl transition cursor-pointer border-b border-white/5 last:border-0">
+                        <span class="w-24 capitalize font-bold text-left text-sm">${dayName}</span>
                         <div class="flex-1 flex justify-center">
-                            <i class="fas ${dIcon} opacity-90"></i>
+                            <i class="fas ${dIcon} opacity-80 text-lg"></i>
                         </div>
-                        <div class="w-24 text-right flex justify-end gap-4">
+                        <div class="w-24 text-right flex justify-end gap-4 text-sm">
                             <span class="font-bold">${max}°</span>
-                            <span class="opacity-50">${min}°</span>
+                            <span class="opacity-40 font-bold">${min}°</span>
                         </div>
                     </div>
                 `;
@@ -343,20 +464,16 @@
             const time = h.time[index].split('T')[1];
             const temp = h.temperature_2m[index];
             const feel = h.apparent_temperature[index];
-            const rain = h.precipitation_probability[index];
-            const hum = h.relative_humidity_2m[index];
-            const press = h.pressure_msl[index];
-            const wind = h.wind_speed_10m[index];
             const html = `
                 <div class="text-center">
                     <h3 class="text-3xl font-bold mb-1">${time}</h3>
                     <p class="text-4xl font-thin mb-6">${temp}°C</p>
                     <div class="grid grid-cols-2 gap-4 text-left bg-white/5 p-4 rounded-2xl">
                         <div><p class="text-xs opacity-50">Sensación</p><p class="font-bold">${feel}°</p></div>
-                        <div><p class="text-xs opacity-50">Prob. Lluvia</p><p class="font-bold">${rain}%</p></div>
-                        <div><p class="text-xs opacity-50">Humedad</p><p class="font-bold">${hum}%</p></div>
-                        <div><p class="text-xs opacity-50">Viento</p><p class="font-bold">${wind} km/h</p></div>
-                        <div><p class="text-xs opacity-50">Presión</p><p class="font-bold">${press} hPa</p></div>
+                        <div><p class="text-xs opacity-50">Prob. Lluvia</p><p class="font-bold">${h.precipitation_probability[index]}%</p></div>
+                        <div><p class="text-xs opacity-50">Humedad</p><p class="font-bold">${h.relative_humidity_2m[index]}%</p></div>
+                        <div><p class="text-xs opacity-50">Viento</p><p class="font-bold">${h.wind_speed_10m[index]} km/h</p></div>
+                        <div><p class="text-xs opacity-50">Presión</p><p class="font-bold">${h.pressure_msl[index]} hPa</p></div>
                     </div>
                 </div>`;
             showModal(html);
@@ -364,24 +481,19 @@
 
         function openDailyModal(index) {
             const d = globalData.daily;
-            const date = new Date(d.time[index]).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
-            const max = d.temperature_2m_max[index];
-            const min = d.temperature_2m_min[index];
-            const uv = d.uv_index_max[index];
-            const rainMax = d.precipitation_probability_max[index];
-            const sunrise = d.sunrise[index].split('T')[1];
-            const sunset = d.sunset[index].split('T')[1];
+            const date = new Date(d.time[index]).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric' });
             const html = `
                 <div class="text-center">
                     <h3 class="text-xl font-bold mb-1 capitalize">${date}</h3>
                     <div class="flex justify-center gap-4 text-3xl my-4">
-                        <span class="font-bold">${max}°</span> <span class="opacity-50">${min}°</span>
+                        <span class="font-bold">${Math.round(d.temperature_2m_max[index])}°</span> 
+                        <span class="opacity-40 font-bold">${Math.round(d.temperature_2m_min[index])}°</span>
                     </div>
                     <div class="grid grid-cols-2 gap-4 text-left bg-white/5 p-4 rounded-2xl">
-                        <div><p class="text-xs opacity-50">Lluvia Máx</p><p class="font-bold text-blue-300">${rainMax}%</p></div>
-                        <div><p class="text-xs opacity-50">Índice UV</p><p class="font-bold text-yellow-300">${uv}</p></div>
-                        <div><p class="text-xs opacity-50">Amanecer</p><p class="font-bold">${sunrise}</p></div>
-                        <div><p class="text-xs opacity-50">Atardecer</p><p class="font-bold">${sunset}</p></div>
+                        <div><p class="text-xs opacity-50">Lluvia Máx</p><p class="font-bold text-blue-300">${d.precipitation_probability_max[index]}%</p></div>
+                        <div><p class="text-xs opacity-50">Índice UV</p><p class="font-bold text-yellow-300">${d.uv_index_max[index]}</p></div>
+                        <div><p class="text-xs opacity-50">Amanecer</p><p class="font-bold">${d.sunrise[index].split('T')[1]}</p></div>
+                        <div><p class="text-xs opacity-50">Atardecer</p><p class="font-bold">${d.sunset[index].split('T')[1]}</p></div>
                     </div>
                 </div>`;
             showModal(html);
@@ -443,7 +555,10 @@
         function toggleSearch() { 
             const bar = document.getElementById('searchBar');
             bar.classList.toggle('hidden');
-            if(!bar.classList.contains('hidden')) document.getElementById('searchInput').focus();
+            if(!bar.classList.contains('hidden')) {
+                document.getElementById('searchInput').focus();
+                document.getElementById('suggestionsList').classList.add('hidden');
+            }
         }
         function addToFavorites() {
             if(!currentCityData) return;
@@ -459,9 +574,9 @@
             list.innerHTML = '';
             favorites.forEach((fav, index) => {
                 list.innerHTML += `
-                    <div onclick="loadFav(${index})" class="bg-white/10 p-3 rounded-xl flex justify-between items-center cursor-pointer hover:bg-white/20 w-full">
-                        <span>${fav.name}</span>
-                        <button onclick="event.stopPropagation(); removeFav(${index})" class="text-red-300 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                    <div onclick="loadFav(${index})" class="bg-white/5 p-4 rounded-2xl flex justify-between items-center cursor-pointer hover:bg-white/10 w-full mb-2 border border-white/5">
+                        <span class="font-bold">${fav.name}</span>
+                        <button onclick="event.stopPropagation(); removeFav(${index})" class="text-red-300/50 hover:text-red-400"><i class="fas fa-trash"></i></button>
                     </div>
                 `;
             });
