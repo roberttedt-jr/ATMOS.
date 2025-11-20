@@ -8,20 +8,17 @@
     <!-- PWA Settings -->
     <meta name="theme-color" content="#4facfe">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <!-- CLAVE iOS: Permite que el contenido suba a la barra de estado -->
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"> 
-    
-    <!-- Icono de la pestaña del navegador (favicon) -->
-    <link rel="icon" href="atmos-icon.png" type="image/png">
-    <!-- Conexión al manifest (para la instalación PWA) -->
-    <link rel="manifest" href="manifest.json">
-    
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1163/1163661.png" type="image/png">
 
     <!-- Librerías -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- LÍNEA PWA: Conecta el manifest -->
+    <link rel="manifest" href="manifest.json">
     
     <script>
         tailwind.config = {
@@ -125,16 +122,37 @@
             -webkit-mask-image: linear-gradient(to bottom, transparent 0px, transparent 120px, black 160px, black calc(100% - 40px), transparent 100%);
         }
 
-        /* Avatar Selection y Dropdown */
+        /* Avatar Selection */
         .avatar-option:hover { transform: scale(1.1); border-color: #FDE047; }
         .avatar-selected { border-color: #FDE047 !important; background-color: rgba(255,255,255,0.2); transform: scale(1.1); }
-        .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out, opacity 0.3s ease; opacity: 0; }
-        .collapsible-content.open { max-height: 1000px; opacity: 1; transition: max-height 0.7s ease-in, opacity 0.5s ease; }
-
-        /* BUSCADOR FLUIDO */
-        #searchBar { transform: translateY(-120%); opacity: 0; pointer-events: none; transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; }
-        #searchBar.search-bar-open { transform: translateY(0); opacity: 1; pointer-events: auto; }
         
+        /* Dropdown custom transition */
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, opacity 0.3s ease;
+            opacity: 0;
+        }
+        .collapsible-content.open {
+            max-height: 1000px; /* Suficientemente grande para el contenido */
+            opacity: 1;
+            transition: max-height 0.7s ease-in, opacity 0.5s ease;
+        }
+
+        /* --- BUSCADOR FLUIDO FIX --- */
+        #searchBar {
+            /* Estado inicial: fuera de vista y transparente */
+            transform: translateY(-120%);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+        #searchBar.search-bar-open { 
+            /* Estado abierto: visible */
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
     </style>
 </head>
 <body class="bg-sunny relative">
@@ -144,7 +162,7 @@
     <!-- CONTENEDOR PRINCIPAL -->
     <div class="w-full h-full md:h-[90vh] md:max-h-[850px] md:w-[400px] bg-glass backdrop-blur-2xl md:rounded-[3rem] shadow-2xl relative overflow-hidden flex flex-col border border-white/20 z-10 text-center mx-auto flex-none ring-1 ring-white/10">
         
-        <!-- HEADER FLOTANTE (ESTABLE) -->
+        <!-- HEADER FLOTANTE -->
         <div class="absolute top-0 left-0 w-full z-30 pt-8 pb-4 px-6 flex justify-between items-center pointer-events-none">
             <button onclick="toggleSidePanel()" class="text-white/90 hover:text-white transition p-2 bg-white/10 rounded-full backdrop-blur-md shadow-sm pointer-events-auto relative">
                 <i class="fas fa-bars text-sm"></i>
@@ -237,10 +255,11 @@
             </div>
         </div>
 
-        <!-- CONTENIDO SCROLLABLE (ESTABLE) -->
+        <!-- CONTENIDO SCROLLABLE -->
         <div class="h-full w-full overflow-y-auto hide-scroll pt-36 pb-28 px-0 fade-mask-top">
             
             <!-- 1. TIEMPO PRINCIPAL -->
+            <!-- Importante: onclick para abrir el buscador -->
             <div class="flex flex-col items-center justify-center mb-8 text-center px-4 w-full">
                 <div class="flex items-center gap-2 text-white/90 mb-4 bg-white/10 px-4 py-1.5 rounded-full backdrop-blur-sm border border-white/5 shadow-sm cursor-pointer hover:bg-white/20 transition" onclick="toggleSearch()">
                     <i class="fas fa-location-arrow text-xs opacity-70"></i>
@@ -655,7 +674,7 @@
                     });
                     list.classList.remove('hidden');
                 } else { list.classList.add('hidden'); }
-            } catch(e) { console.error("Error API", e); }
+            } catch(e) { console.error(e); }
         }
 
         function selectSuggestion(city) {
@@ -1042,7 +1061,7 @@
                 cloud.innerHTML = '<i class="fas fa-cloud text-white text-9xl filter blur-xl"></i>';
                 cloud.style.top = '10%';
                 cloud.style.animationDuration = '20s';
-                    container.appendChild(cloud);
+                container.appendChild(cloud);
             }
         }
 
@@ -1117,5 +1136,4 @@
         }
     </script>
 </body>
-
 </html>
