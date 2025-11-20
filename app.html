@@ -8,17 +8,20 @@
     <!-- PWA Settings -->
     <meta name="theme-color" content="#4facfe">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- CLAVE iOS: Permite que el contenido suba a la barra de estado -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"> 
+    
+    <!-- Icono de la pestaña del navegador (favicon) -->
     <link rel="icon" href="atmos-icon.png" type="image/png">
+    <!-- Conexión al manifest (para la instalación PWA) -->
+    <link rel="manifest" href="manifest.json">
+    
 
     <!-- Librerías -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600;800&display=swap" rel="stylesheet">
-    
-    <!-- LÍNEA PWA: Conecta el manifest -->
-    <link rel="manifest" href="manifest.json">
     
     <script>
         tailwind.config = {
@@ -100,10 +103,12 @@
         @keyframes pulseSun { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         .logo-dot { animation: pulse 2s infinite; }
 
-        /* Modales y Skeleton */
+        /* Modales */
         .modal { transition: opacity 0.3s ease, transform 0.3s ease; }
         .modal-open { opacity: 1; pointer-events: auto; transform: scale(1); }
         .modal-closed { opacity: 0; pointer-events: none; transform: scale(0.95); }
+
+        /* Skeleton */
         .skeleton {
             background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 75%);
             background-size: 200% 100%;
@@ -113,6 +118,8 @@
         }
         .skeleton * { opacity: 0; }
         @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        /* Fade Masks */
         .fade-mask-top {
             mask-image: linear-gradient(to bottom, transparent 0px, transparent 120px, black 160px, black calc(100% - 40px), transparent 100%);
             -webkit-mask-image: linear-gradient(to bottom, transparent 0px, transparent 120px, black 160px, black calc(100% - 40px), transparent 100%);
@@ -128,16 +135,6 @@
         #searchBar { transform: translateY(-120%); opacity: 0; pointer-events: none; transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; }
         #searchBar.search-bar-open { transform: translateY(0); opacity: 1; pointer-events: auto; }
         
-        /* --- REGLAS DE INTEGRACIÓN iOS (CORREGIDAS) --- */
-        .safe-area-header { 
-            /* Mueve el Header fijo (logo y botones) hacia abajo */
-            padding-top: calc(3rem + env(safe-area-inset-top)); 
-        }
-        .scroll-compensation {
-            /* Mueve el contenido desplazable (scroll) para que empiece donde termina el Header */
-            padding-top: calc(5.5rem + env(safe-area-inset-top)); 
-        }
-        /* --- FIN REGLAS CORREGIDAS --- */
     </style>
 </head>
 <body class="bg-sunny relative">
@@ -147,8 +144,8 @@
     <!-- CONTENEDOR PRINCIPAL -->
     <div class="w-full h-full md:h-[90vh] md:max-h-[850px] md:w-[400px] bg-glass backdrop-blur-2xl md:rounded-[3rem] shadow-2xl relative overflow-hidden flex flex-col border border-white/20 z-10 text-center mx-auto flex-none ring-1 ring-white/10">
         
-        <!-- HEADER FLOTANTE (CLASE CORREGIDA) -->
-        <div class="absolute top-0 left-0 w-full z-30 pb-4 px-6 flex justify-between items-center pointer-events-none safe-area-header">
+        <!-- HEADER FLOTANTE (ESTABLE) -->
+        <div class="absolute top-0 left-0 w-full z-30 pt-8 pb-4 px-6 flex justify-between items-center pointer-events-none">
             <button onclick="toggleSidePanel()" class="text-white/90 hover:text-white transition p-2 bg-white/10 rounded-full backdrop-blur-md shadow-sm pointer-events-auto relative">
                 <i class="fas fa-bars text-sm"></i>
                 <!-- Indicador de perfil si existe -->
@@ -212,6 +209,7 @@
                 <div>
                     <h3 class="text-xs font-bold uppercase opacity-50 tracking-widest mb-3">Mapas Pro</h3>
                     <div class="grid grid-cols-1 gap-2">
+                        <!-- Icono de lluvia actualizado aquí -->
                         <button onclick="openMap('rain')" class="bg-white/5 hover:bg-blue-500/20 border border-white/10 p-3 rounded-xl flex items-center gap-3 transition group">
                             <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition text-blue-300"><i class="fas fa-cloud-showers-heavy"></i></div>
                             <span class="font-bold text-sm">Radar de Lluvia</span>
@@ -239,8 +237,8 @@
             </div>
         </div>
 
-        <!-- CONTENIDO SCROLLABLE (CLASE CORREGIDA) -->
-        <div class="h-full w-full overflow-y-auto hide-scroll scroll-compensation pb-28 px-0 fade-mask-top">
+        <!-- CONTENIDO SCROLLABLE (ESTABLE) -->
+        <div class="h-full w-full overflow-y-auto hide-scroll pt-36 pb-28 px-0 fade-mask-top">
             
             <!-- 1. TIEMPO PRINCIPAL -->
             <div class="flex flex-col items-center justify-center mb-8 text-center px-4 w-full">
