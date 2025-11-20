@@ -11,10 +11,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Atmos">
     
-    <!-- --- CORRECCIÓN DE ICONOS PARA IPHONE --- -->
-    <!-- Esta es la línea que faltaba y causaba que se viera la "A" negra -->
     <link rel="apple-touch-icon" href="atmos-icon.png">
-    <!-- Icono estándar para el resto -->
     <link rel="icon" href="atmos-icon.png" type="image/png">
 
     <!-- Librerías -->
@@ -35,17 +32,16 @@
                     },
                     animation: {
                         'gradient-xy': 'gradient-xy 15s ease infinite',
+                        'bounce-x': 'bounceHorizontal 1.5s ease-in-out 2',
                     },
                     keyframes: {
                         'gradient-xy': {
-                            '0%, 100%': {
-                                'background-size': '200% 200%',
-                                'background-position': 'left center'
-                            },
-                            '50%': {
-                                'background-size': '200% 200%',
-                                'background-position': 'right center'
-                            }
+                            '0%, 100%': { 'background-size': '200% 200%', 'background-position': 'left center' },
+                            '50%': { 'background-size': '200% 200%', 'background-position': 'right center' }
+                        },
+                        bounceHorizontal: {
+                            '0%, 100%': { transform: 'translateX(0)' },
+                            '50%': { transform: 'translateX(-20px)' }
                         }
                     }
                 }
@@ -55,8 +51,23 @@
 
     <style>
         /* --- ESTILOS GLOBALES --- */
+        * {
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+
+        /* CORRECCIÓN VISUAL DE SWIPE (v4.2): Evita selección de texto al deslizar */
+        .noselect {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
         body {
-            transition: background-image 0.5s ease-in-out;
+            transition: background-image 0.5s ease-in-out, color 0.5s ease;
             color: white;
             height: 100vh;
             width: 100%;
@@ -65,7 +76,6 @@
             overscroll-behavior-y: none;
             font-family: 'Outfit', sans-serif;
             background-color: #1a1a1a;
-            /* ANIMACIÓN DE FONDO */
             background-size: 400% 400%;
             animation: gradientAnimation 20s ease infinite;
         }
@@ -76,7 +86,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Fondos con movimiento */
+        /* Fondos */
         .bg-sunny { background: linear-gradient(-45deg, #4facfe, #00f2fe, #43e97b); } 
         .bg-cloudy { background: linear-gradient(-45deg, #637786, #9CA7B1, #2C3E50); } 
         .bg-rainy { background: linear-gradient(-45deg, #203A43, #2C5364, #0F2027); } 
@@ -86,6 +96,26 @@
         .bg-sunset { background: linear-gradient(-45deg, #654ea3, #eaafc8, #2C3E50); }
         .bg-day { background: linear-gradient(-45deg, #4A90E2, #50C9C3, #96deda); }
 
+        /* Contraste */
+        body.high-contrast-mode {
+            color: #1e293b !important;
+            text-shadow: none !important;
+        }
+        body.high-contrast-mode .text-shadow, 
+        body.high-contrast-mode .text-shadow-lg {
+            text-shadow: none !important;
+        }
+        body.high-contrast-mode .bg-glassDark {
+            background-color: rgba(255, 255, 255, 0.6) !important;
+            border-color: rgba(255, 255, 255, 0.7) !important;
+            color: #000 !important;
+            box-shadow: 0 4px 15px -1px rgba(0, 0, 0, 0.1);
+        }
+        body.high-contrast-mode i { color: #0f172a !important; }
+        body.high-contrast-mode .skeleton {
+            background: linear-gradient(90deg, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.05) 75%) !important;
+        }
+
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -94,7 +124,7 @@
         .text-shadow-lg { text-shadow: 0 4px 8px rgba(0,0,0,0.4); }
 
         /* Modales */
-        .modal { transition: opacity 0.3s ease, transform 0.3s ease; }
+        .modal { transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .modal-open { opacity: 1; pointer-events: auto; transform: scale(1); }
         .modal-closed { opacity: 0; pointer-events: none; transform: scale(0.95); }
 
@@ -116,8 +146,8 @@
         }
 
         /* Avatar Selection */
-        .avatar-option:hover { transform: scale(1.1); border-color: #FDE047; }
-        .avatar-selected { border-color: #FDE047 !important; background-color: rgba(255,255,255,0.2); transform: scale(1.1); }
+        .avatar-option:hover { transform: scale(1.1); border-color: #fff; }
+        .avatar-selected { border-color: #fff !important; background-color: rgba(255,255,255,0.3); transform: scale(1.15); box-shadow: 0 0 15px rgba(255,255,255,0.3); }
         
         /* Dropdown custom transition */
         .collapsible-content {
@@ -132,7 +162,7 @@
             transition: max-height 0.7s ease-in, opacity 0.5s ease;
         }
 
-        /* Custom Toast Notification */
+        /* Custom Toast */
         .toast-notification {
             position: absolute;
             top: 120px;
@@ -159,20 +189,16 @@
         }
         .toast-notification.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        /* NAV BAR TRANSPARENTE INTEGRADO */
+        /* NAV BAR */
         .nav-bar {
             background-color: transparent; 
             padding-bottom: env(safe-area-inset-bottom, 20px);
             pointer-events: none;
         }
-        .nav-bar > * {
-            pointer-events: auto; 
-        }
+        .nav-bar > * { pointer-events: auto; }
 
-        /* HEADER DINÁMICO */
-        #mainHeader {
-            transition: all 0.5s ease-in-out;
-        }
+        /* HEADER */
+        #mainHeader { transition: all 0.5s ease-in-out; }
         .header-scrolled {
             background: rgba(0, 0, 0, 0.4); 
             backdrop-filter: blur(20px);
@@ -184,7 +210,7 @@
             height: 90px !important; 
         }
 
-        /* PAGINATION DOTS */
+        /* PAGINATION DOTS (RESTAURADO v4.2: Fondo oscuro tipo pastilla) */
         .dot {
             width: 6px;
             height: 6px;
@@ -201,23 +227,23 @@
         }
     </style>
 </head>
-<body class="bg-night relative">
+<body class="bg-night relative noselect"> <!-- v4.2: noselect añadido al body -->
 
-    <!-- Toast Container -->
+    <!-- Toast -->
     <div id="customToast" class="toast-notification">
-        <i class="fas fa-info-circle text-yellow-400"></i>
+        <i class="fas fa-info-circle text-white"></i>
         <span id="toastMessage">Notificación</span>
     </div>
 
     <!-- CONTENEDOR PRINCIPAL -->
     <div id="mainContainer" class="w-full h-full relative overflow-hidden flex flex-col z-10 text-center">
         
-        <!-- HEADER DINÁMICO -->
+        <!-- HEADER -->
         <div id="mainHeader" class="absolute top-0 left-0 w-full z-30 pt-6 pb-2 px-6 flex justify-between items-center pointer-events-none h-20">
             <div class="text-left transition-transform duration-300 origin-left" id="headerLogoContainer">
                 <h1 class="font-extrabold tracking-widest text-xl text-white drop-shadow-lg leading-none">ATMOS.</h1>
             </div>
-            <button onclick="openProfileModal()" class="pointer-events-auto transition hover:scale-105 active:scale-95" id="headerAvatarBtn">
+            <button onclick="triggerHaptic(); openProfileModal()" class="pointer-events-auto transition hover:scale-105 active:scale-95" id="headerAvatarBtn">
                  <div id="headerAvatarDisplay" class="w-9 h-9 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-base shadow-lg">
                      <i class="fas fa-user text-white drop-shadow-sm"></i>
                  </div>
@@ -225,10 +251,10 @@
         </div>
 
         <!-- SIDE PANEL -->
-        <div id="sidePanel" class="absolute inset-y-0 right-0 w-full md:w-96 bg-black/90 backdrop-blur-2xl z-50 transform translate-x-full transition-transform duration-300 text-left flex flex-col shadow-2xl border-l border-white/10">
+        <div id="sidePanel" class="absolute inset-y-0 right-0 w-full md:w-96 bg-black/80 backdrop-blur-2xl z-50 transform translate-x-full transition-transform duration-300 text-left flex flex-col shadow-2xl border-l border-white/10">
             <div class="p-6 pb-4 border-b border-white/10 flex justify-between items-center mt-10">
                 <h2 class="text-xl font-bold tracking-wide text-white">LUGARES</h2>
-                <button onclick="toggleSidePanel()"><i class="fas fa-times text-lg text-white/50 hover:text-white"></i></button>
+                <button onclick="triggerHaptic(); toggleSidePanel()"><i class="fas fa-times text-lg text-white/50 hover:text-white"></i></button>
             </div>
             <div class="px-6 py-4 border-b border-white/5">
                  <form onsubmit="event.preventDefault(); searchCity();" class="relative">
@@ -240,30 +266,37 @@
             <div class="overflow-y-auto flex-1 p-6 space-y-4 hide-scroll">
                 <h3 class="text-xs font-bold uppercase opacity-50 tracking-widest mb-2">Guardados</h3>
                 <div id="favoritesList" class="space-y-2"></div>
-                <button onclick="addToFavorites()" class="mt-4 w-full py-3 rounded-xl border border-dashed border-white/20 hover:bg-white/5 transition flex items-center justify-center gap-2 text-sm opacity-70 hover:opacity-100">
+                <button onclick="triggerHaptic(); addToFavorites()" class="mt-4 w-full py-3 rounded-xl border border-dashed border-white/20 hover:bg-white/5 transition flex items-center justify-center gap-2 text-sm opacity-70 hover:opacity-100">
                     <i class="fas fa-map-marker-alt"></i> Guardar Ubicación Actual
                 </button>
                 <div class="mt-8 pt-8 border-t border-white/10">
-                    <button onclick="openProfileModal()" class="text-xs uppercase tracking-widest opacity-60 hover:opacity-100 flex items-center gap-2">
+                    <button onclick="triggerHaptic(); openProfileModal()" class="text-xs uppercase tracking-widest opacity-60 hover:opacity-100 flex items-center gap-2">
                         <i class="fas fa-user-cog"></i> Ajustes de Perfil
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- CONTENIDO PRINCIPAL -->
+        <!-- CONTENIDO -->
         <div id="swipeArea" class="h-full w-full overflow-y-auto hide-scroll pt-20 pb-32 px-0 fade-mask-top relative z-0">
-            <div class="flex flex-col items-center justify-center mb-10 text-center px-4 w-full pt-4">
+            <div class="flex flex-col items-center justify-center mb-8 text-center px-4 w-full pt-4">
                 <div class="mb-2">
                     <h2 id="cityName" class="text-3xl font-bold tracking-wide uppercase leading-none drop-shadow-md text-shadow-lg">Localizando...</h2>
                     <p id="localTime" class="text-sm font-mono opacity-90 mt-1 tracking-wider drop-shadow-sm text-shadow">--:--</p>
                 </div>
-                <div id="mainIcon" class="text-7xl mb-4 drop-shadow-2xl flex justify-center transform scale-110 mt-4 transition-all duration-500 filter drop-shadow-lg">
+                
+                <div id="mainIcon" class="text-7xl mb-2 drop-shadow-2xl flex justify-center transform scale-110 mt-4 transition-all duration-500 filter drop-shadow-lg">
                     <i class="fas fa-spinner fa-spin text-4xl"></i>
                 </div>
+                
                 <h1 id="currentTemp" class="text-[130px] font-light tracking-tighter leading-none text-center w-full drop-shadow-2xl text-shadow-lg pl-4 skeleton-target">--°</h1>
+                
                 <p id="weatherDesc" class="text-2xl font-medium capitalize opacity-100 mt-[-10px] text-center w-full drop-shadow-md text-shadow skeleton-target">Cargando...</p>
-                <div class="flex justify-center gap-8 mt-6 text-base font-bold opacity-100 w-full text-shadow">
+                
+                <!-- ADVISOR -->
+                <div id="aiAdvisor" class="mt-2 mb-2 px-4 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 inline-block text-xs font-medium text-white/90 opacity-0 transition-opacity duration-1000 max-w-[80%] shadow-lg"></div>
+
+                <div class="flex justify-center gap-8 mt-4 text-base font-bold opacity-100 w-full text-shadow">
                     <span class="flex flex-col items-center"><span class="text-[10px] opacity-80 uppercase">Min</span> <span id="minTemp" class="skeleton-target">--°</span></span>
                     <div class="w-px h-8 bg-white/50 shadow-sm"></div>
                     <span class="flex flex-col items-center"><span class="text-[10px] opacity-80 uppercase">Max</span> <span id="maxTemp" class="skeleton-target">--°</span></span>
@@ -277,7 +310,10 @@
             </div>
 
             <h3 class="font-bold opacity-90 tracking-widest text-[10px] uppercase mb-4 px-6 text-left text-shadow">Detalles Actuales</h3>
-            <div class="grid grid-cols-3 gap-3 px-6 mb-10 w-full">
+            
+            <!-- v4.2: GRIT DE DETALLES REESTRUCTURADO (3 visibles + 6 ocultos) -->
+            <div class="grid grid-cols-3 gap-3 px-6 mb-4 w-full">
+                <!-- LOS 3 PRINCIPALES (Siempre visibles) -->
                 <div class="bg-glassDark rounded-2xl p-3 flex flex-col items-center justify-center border border-white/10 backdrop-blur-md shadow-lg">
                     <i class="fas fa-wind mb-2 opacity-80 text-lg" id="windDirArrow"></i>
                     <p id="windSpeed" class="font-bold text-base leading-none skeleton-target">--</p>
@@ -293,21 +329,46 @@
                     <p id="rainProb" class="font-bold text-base skeleton-target">--</p>
                     <p class="text-[9px] uppercase opacity-60 font-bold tracking-widest mt-1">Prob.</p>
                 </div>
-                 <div class="bg-glassDark rounded-2xl p-3 flex flex-col items-center justify-center border border-white/10 backdrop-blur-md shadow-lg">
+
+                <!-- LOS 6 SECUNDARIOS (Ocultos por defecto, clase extra-detail) -->
+                <div class="extra-detail hidden bg-glassDark rounded-2xl p-3 flex flex-col items-center justify-center border border-white/10 backdrop-blur-md shadow-lg">
                     <i class="fas fa-sun mb-2 opacity-80 text-lg"></i>
                     <p id="uvDisplay" class="font-bold text-base skeleton-target">--</p>
                     <p class="text-[9px] uppercase opacity-60 font-bold tracking-widest mt-1">UV</p>
                 </div>
-                <div class="bg-glassDark rounded-2xl p-3 flex flex-col items-center justify-center border border-white/10 backdrop-blur-md shadow-lg">
+                <div class="extra-detail hidden bg-glassDark rounded-2xl p-3 flex flex-col items-center justify-center border border-white/10 backdrop-blur-md shadow-lg">
                     <i id="sunIcon" class="fas fa-mountain-sun mb-2 opacity-80 text-lg"></i>
                     <p id="sunTime" class="font-bold text-base skeleton-target">--</p>
                     <p class="text-[9px] uppercase opacity-60 font-bold tracking-widest mt-1">Sol</p>
                 </div>
-                <div class="bg-glassDark rounded-2xl p-3 flex flex-col items-center justify-center border border-white/10 backdrop-blur-md shadow-lg">
+                <div class="extra-detail hidden bg-glassDark rounded-2xl p-3 flex flex-col items-center justify-center border border-white/10 backdrop-blur-md shadow-lg">
                     <i class="fas fa-lungs mb-2 opacity-80 text-lg" id="aqiIcon"></i>
                     <p id="aqiDisplay" class="font-bold text-base skeleton-target">--</p>
                     <p class="text-[9px] uppercase opacity-60 font-bold tracking-widest mt-1">AQI</p>
                 </div>
+                <div class="extra-detail hidden bg-glassDark rounded-2xl p-3 flex flex-col items-center justify-center border border-white/10 backdrop-blur-md shadow-lg">
+                    <i class="fas fa-compress-arrows-alt mb-2 opacity-80 text-lg"></i>
+                    <p id="pressureDisplay" class="font-bold text-base skeleton-target">--</p>
+                    <p class="text-[9px] uppercase opacity-60 font-bold tracking-widest mt-1">Presión</p>
+                </div>
+                <div class="extra-detail hidden bg-glassDark rounded-2xl p-3 flex flex-col items-center justify-center border border-white/10 backdrop-blur-md shadow-lg">
+                    <i class="fas fa-droplet mb-2 opacity-80 text-lg"></i>
+                    <p id="dewPointDisplay" class="font-bold text-base skeleton-target">--</p>
+                    <p class="text-[9px] uppercase opacity-60 font-bold tracking-widest mt-1">Rocío</p>
+                </div>
+                <div class="extra-detail hidden bg-glassDark rounded-2xl p-3 flex flex-col items-center justify-center border border-white/10 backdrop-blur-md shadow-lg">
+                    <i class="fas fa-eye mb-2 opacity-80 text-lg"></i>
+                    <p id="visibilityDisplay" class="font-bold text-base skeleton-target">--</p>
+                    <p class="text-[9px] uppercase opacity-60 font-bold tracking-widest mt-1">Visib.</p>
+                </div>
+            </div>
+            
+            <!-- Botón Ver Más Detalles -->
+            <div class="px-6 mb-10">
+                <button onclick="triggerHaptic(); toggleDetails()" id="toggleDetailsBtn" class="w-full py-2 rounded-xl text-xs font-bold opacity-70 hover:opacity-100 transition flex items-center justify-center gap-2 bg-white/5 border border-white/5">
+                    <span id="detailsBtnText">Ver más detalles</span>
+                    <i class="fas fa-chevron-down text-[10px] transition duration-300" id="detailsBtnArrow"></i>
+                </button>
             </div>
 
             <div class="px-6 mb-10 w-full">
@@ -318,7 +379,7 @@
                 <h3 class="font-bold opacity-90 mb-4 text-left px-2 tracking-widest text-[10px] uppercase text-shadow">Pronóstico 7 Días</h3>
                 <div id="dailyForecast" class="bg-glassDark rounded-2xl p-2 space-y-0 divide-y divide-white/10 w-full border border-white/10 backdrop-blur-md shadow-lg"></div>
                  <div class="mt-4">
-                    <button onclick="toggleExtendedForecast()" id="toggleExtendedBtn" class="w-full py-3 rounded-xl text-xs font-bold opacity-80 hover:opacity-100 transition flex items-center justify-center gap-2 bg-black/20 border border-white/5 text-shadow">
+                    <button onclick="triggerHaptic(); toggleExtendedForecast()" id="toggleExtendedBtn" class="w-full py-3 rounded-xl text-xs font-bold opacity-80 hover:opacity-100 transition flex items-center justify-center gap-2 bg-black/20 border border-white/5 text-shadow">
                         <span>Ver 14 Días</span>
                         <i class="fas fa-chevron-down text-[10px] transition duration-300" id="extendedArrow"></i>
                     </button>
@@ -340,7 +401,7 @@
                         </div>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="rainAlertToggle" class="sr-only peer" onchange="toggleRainAlert()">
+                        <input type="checkbox" id="rainAlertToggle" class="sr-only peer" onchange="triggerHaptic(); toggleRainAlert()">
                         <div class="w-11 h-6 bg-black/40 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500 border border-white/10"></div>
                     </label>
                 </div>
@@ -358,56 +419,71 @@
         
         <!-- NAV BAR FIXED -->
         <div class="absolute bottom-0 left-0 w-full h-20 nav-bar z-40 flex items-center justify-between px-8">
-            <button onclick="openMap('rain')" class="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:text-white hover:bg-white/20 transition active:scale-90 shadow-2xl backdrop-blur-xl">
+            <button onclick="triggerHaptic(); openMap('rain')" class="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:text-white hover:bg-white/20 transition active:scale-90 shadow-2xl backdrop-blur-xl">
                 <i class="fas fa-map text-lg drop-shadow-md"></i>
             </button>
+            
+            <!-- PAGINATION DOTS (RESTAURADO FONDO v4.2) -->
             <div class="h-8 px-4 bg-white/10 border border-white/20 rounded-full flex items-center gap-2 backdrop-blur-xl shadow-2xl">
                 <div id="paginationDots" class="flex gap-2 items-center justify-center px-1">
                     <div class="dot active"></div>
                 </div>
             </div>
-            <button onclick="toggleSidePanel()" class="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:text-white hover:bg-white/20 transition active:scale-90 shadow-2xl backdrop-blur-xl">
+            
+            <button onclick="triggerHaptic(); toggleSidePanel()" class="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:text-white hover:bg-white/20 transition active:scale-90 shadow-2xl backdrop-blur-xl">
                 <i class="fas fa-list-ul text-lg drop-shadow-md"></i>
             </button>
         </div>
 
-        <!-- MODALES -->
-        <div id="detailModal" class="absolute inset-0 z-[60] flex items-center justify-center p-6 modal modal-closed bg-black/30 backdrop-blur-xl transition-all duration-500">
-            <div class="bg-gray-900/70 border border-white/10 text-white w-full max-w-sm rounded-3xl p-8 shadow-2xl relative flex flex-col items-center text-center backdrop-blur-md">
-                <button onclick="closeModal('detailModal')" class="absolute top-5 right-5 w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition"><i class="fas fa-times text-sm"></i></button>
+        <!-- MODALES Y RESTO DEL CÓDIGO IGUAL (Detail, Profile, Map) -->
+        <div id="detailModal" class="absolute inset-0 z-[60] flex items-center justify-center p-6 modal modal-closed bg-black/60 backdrop-blur-xl">
+            <div class="bg-gray-900/80 border border-white/10 text-white w-full max-w-sm rounded-3xl p-8 shadow-2xl relative flex flex-col items-center text-center backdrop-blur-2xl">
+                <button onclick="triggerHaptic(); closeModal('detailModal')" class="absolute top-5 right-5 w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition"><i class="fas fa-times text-sm"></i></button>
                 <div id="modalContent" class="w-full"></div>
             </div>
         </div>
 
-        <div id="profileModal" class="absolute inset-0 z-[70] flex items-center justify-center p-6 modal modal-closed bg-black/30 backdrop-blur-xl transition-all duration-500">
-            <div class="bg-gray-900/70 border border-white/10 text-white w-full max-w-sm rounded-3xl p-8 shadow-2xl relative flex flex-col text-center backdrop-blur-md">
-                <button onclick="closeModal('profileModal')" class="absolute top-4 right-4 w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition"><i class="fas fa-times text-sm"></i></button>
+        <div id="profileModal" class="absolute inset-0 z-[70] flex items-center justify-center p-6 modal modal-closed bg-black/40 backdrop-blur-xl">
+            <div class="bg-black/40 border border-white/10 text-white w-full max-w-sm rounded-3xl p-8 shadow-2xl relative flex flex-col text-center backdrop-blur-xl">
+                <button onclick="triggerHaptic(); closeModal('profileModal')" class="absolute top-4 right-4 w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition"><i class="fas fa-times text-sm"></i></button>
                 <div id="profileCreateState" class="hidden">
                     <div class="mb-6 flex justify-center">
-                        <div class="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center text-black text-2xl shadow-lg shadow-yellow-400/20">
+                        <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center text-white text-2xl shadow-lg border border-white/20">
                             <i class="fas fa-rocket"></i>
                         </div>
                     </div>
                     <h2 class="text-2xl font-bold mb-2">Bienvenido a Atmos</h2>
-                    <p class="text-sm opacity-50 mb-8">Crea tu identidad climática.</p>
-                    <input type="text" id="profileNameInput" placeholder="Tu Nombre" maxlength="12" class="bg-white/5 border border-white/10 rounded-xl p-4 text-center text-white placeholder-white/30 outline-none focus:border-yellow-400 mb-6 w-full font-bold text-lg">
-                    <p class="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-4">Elige tu Avatar</p>
-                    <div class="grid grid-cols-4 gap-3 mb-8" id="avatarGrid"></div>
-                    <button onclick="saveProfile()" class="bg-white text-black font-bold py-4 rounded-xl hover:scale-105 transition shadow-lg w-full">
-                        Comenzar
-                    </button>
+                    <p class="text-sm opacity-50 mb-6">Tu panel climático personal.</p>
+                    <input type="text" id="profileNameInput" placeholder="Tu Nombre" maxlength="12" class="bg-white/5 border border-white/10 rounded-xl p-4 text-center text-white placeholder-white/30 outline-none focus:border-white/50 mb-6 w-full font-bold text-lg transition">
+                    <p class="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-3">Elige tu Avatar</p>
+                    <div class="grid grid-cols-4 gap-3 mb-6" id="avatarGrid"></div>
+                    <p class="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-3">Tus Unidades</p>
+                    <div class="flex gap-2 mb-8">
+                         <button type="button" onclick="selectCreateUnit('metric', this)" class="flex-1 py-3 rounded-xl border border-white/20 bg-white/10 hover:bg-white/20 transition flex flex-col items-center gap-1 unit-select-btn selected-unit">
+                             <span class="font-bold text-sm">Métrico</span><span class="text-[9px] opacity-60">°C • km/h</span>
+                         </button>
+                         <button type="button" onclick="selectCreateUnit('imperial', this)" class="flex-1 py-3 rounded-xl border border-transparent hover:bg-white/10 transition flex flex-col items-center gap-1 unit-select-btn">
+                             <span class="font-bold text-sm">Imperial</span><span class="text-[9px] opacity-60">°F • mph</span>
+                         </button>
+                    </div>
+                    <button onclick="triggerHaptic(); saveProfile()" class="bg-white text-black font-bold py-4 rounded-xl hover:scale-105 transition shadow-lg w-full">Comenzar</button>
                 </div>
                 <div id="profileViewState" class="hidden flex-col items-center justify-center py-4">
                     <div id="viewAvatar" class="w-24 h-24 rounded-full bg-gray-800/50 mb-4 flex items-center justify-center text-4xl shadow-2xl border-2 border-white/20 backdrop-blur-md"></div>
                     <h2 id="viewName" class="text-3xl font-bold mb-1">Usuario</h2>
                     <p class="text-sm opacity-50 mb-8 uppercase tracking-widest">Miembro Atmos</p>
+                    <div class="w-full mb-8 bg-white/5 rounded-xl p-4 border border-white/10">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold uppercase tracking-wider opacity-70">Sistema</span>
+                            <div class="flex items-center gap-2 bg-black/30 rounded-lg p-1 border border-white/5">
+                                <button id="unitMetricBtn" onclick="triggerHaptic(); toggleUnits('metric')" class="px-3 py-1 rounded text-[10px] font-bold transition bg-white text-black">Métrico</button>
+                                <button id="unitImperialBtn" onclick="triggerHaptic(); toggleUnits('imperial')" class="px-3 py-1 rounded text-[10px] font-bold transition opacity-50 hover:opacity-100">Imperial</button>
+                            </div>
+                        </div>
+                    </div>
                     <div class="flex gap-3 w-full">
-                         <button onclick="enableEditMode()" class="flex-1 py-3 bg-white/10 rounded-xl text-sm font-bold hover:bg-white/20 transition">
-                             <i class="fas fa-pen mr-2"></i> Editar
-                         </button>
-                         <button onclick="closeModal('profileModal')" class="flex-1 py-3 border border-white/10 rounded-xl text-sm font-bold hover:bg-white/5 transition">
-                             Cerrar
-                         </button>
+                         <button onclick="triggerHaptic(); enableEditMode()" class="flex-1 py-3 bg-white/10 rounded-xl text-sm font-bold hover:bg-white/20 transition"><i class="fas fa-pen mr-2"></i> Editar</button>
+                         <button onclick="triggerHaptic(); closeModal('profileModal')" class="flex-1 py-3 border border-white/10 rounded-xl text-sm font-bold hover:bg-white/5 transition">Cerrar</button>
                     </div>
                 </div>
             </div>
@@ -416,27 +492,16 @@
         <div id="mapModal" class="absolute inset-0 z-[80] flex flex-col bg-black transition-transform duration-500 transform translate-y-full">
             <div class="flex justify-between items-center p-4 bg-black/90 backdrop-blur-xl z-10 border-b border-white/10 pt-10">
                 <h2 id="mapTitle" class="font-bold text-sm tracking-wide flex items-center gap-2 uppercase"><i class="fas fa-radar text-yellow-400"></i> Mapa</h2>
-                <button onclick="closeMap()" class="bg-white/10 px-4 py-2 rounded-full text-xs font-bold hover:bg-white/20 transition border border-white/10">Hecho</button>
+                <button onclick="triggerHaptic(); closeMap()" class="bg-white/10 px-4 py-2 rounded-full text-xs font-bold hover:bg-white/20 transition border border-white/10">Hecho</button>
             </div>
             <div class="flex-1 relative w-full bg-gray-900">
                  <iframe id="windyFrame" width="100%" height="100%" src="" frameborder="0" class="absolute inset-0"></iframe>
-                 <div class="absolute inset-0 flex items-center justify-center pointer-events-none" id="mapLoader">
-                     <i class="fas fa-spinner fa-spin text-4xl text-white/50"></i>
-                 </div>
+                 <div class="absolute inset-0 flex items-center justify-center pointer-events-none" id="mapLoader"><i class="fas fa-spinner fa-spin text-4xl text-white/50"></i></div>
             </div>
             <div class="absolute bottom-24 left-1/2 transform -translate-x-1/2 flex gap-4 z-20 bg-black/80 backdrop-blur-md p-2 rounded-full border border-white/10 shadow-2xl">
-                 <button onclick="openMap('rain')" class="w-12 h-12 rounded-full hover:bg-white/20 text-blue-300 flex flex-col items-center justify-center gap-1 transition active:scale-90">
-                     <i class="fas fa-cloud-showers-heavy text-lg"></i>
-                     <span class="text-[8px] uppercase font-bold">Lluvia</span>
-                 </button>
-                 <button onclick="openMap('wind')" class="w-12 h-12 rounded-full hover:bg-white/20 text-cyan-300 flex flex-col items-center justify-center gap-1 transition active:scale-90">
-                     <i class="fas fa-wind text-lg"></i>
-                     <span class="text-[8px] uppercase font-bold">Viento</span>
-                 </button>
-                 <button onclick="openMap('temp')" class="w-12 h-12 rounded-full hover:bg-white/20 text-orange-300 flex flex-col items-center justify-center gap-1 transition active:scale-90">
-                     <i class="fas fa-thermometer-half text-lg"></i>
-                     <span class="text-[8px] uppercase font-bold">Temp</span>
-                 </button>
+                 <button onclick="triggerHaptic(); openMap('rain')" class="w-12 h-12 rounded-full hover:bg-white/20 text-blue-300 flex flex-col items-center justify-center gap-1 transition active:scale-90"><i class="fas fa-cloud-showers-heavy text-lg"></i><span class="text-[8px] uppercase font-bold">Lluvia</span></button>
+                 <button onclick="triggerHaptic(); openMap('wind')" class="w-12 h-12 rounded-full hover:bg-white/20 text-cyan-300 flex flex-col items-center justify-center gap-1 transition active:scale-90"><i class="fas fa-wind text-lg"></i><span class="text-[8px] uppercase font-bold">Viento</span></button>
+                 <button onclick="triggerHaptic(); openMap('temp')" class="w-12 h-12 rounded-full hover:bg-white/20 text-orange-300 flex flex-col items-center justify-center gap-1 transition active:scale-90"><i class="fas fa-thermometer-half text-lg"></i><span class="text-[8px] uppercase font-bold">Temp</span></button>
             </div>
         </div>
 
@@ -452,73 +517,75 @@
         let currentCityData = null;
         let favorites = JSON.parse(localStorage.getItem('weatherFavs')) || [];
         let userProfile = JSON.parse(localStorage.getItem('atmosProfile')) || null;
+        let currentUnits = localStorage.getItem('atmosUnits') || 'metric';
+        let tempUnitSelection = 'metric';
         let searchTimeout;
         let tempChartInstance = null;
         let selectedAvatarIcon = 'fa-user-astronaut';
         let currentViewIndex = 0; 
         let homeLocation = { lat: 40.4165, lon: -3.7026, name: "Madrid" }; 
 
+        // Arrays e iconos igual que antes
         const avatars = [
-            { icon: 'fa-user-astronaut', color: 'bg-purple-500' },
-            { icon: 'fa-sun', color: 'bg-yellow-500' },
-            { icon: 'fa-bolt', color: 'bg-blue-500' },
-            { icon: 'fa-snowflake', color: 'bg-cyan-400' },
-            { icon: 'fa-cloud-moon', color: 'bg-indigo-500' },
-            { icon: 'fa-poo-storm', color: 'bg-amber-700' },
-            { icon: 'fa-cat', color: 'bg-orange-400' },
-            { icon: 'fa-robot', color: 'bg-gray-500' }
+            { icon: 'fa-user-astronaut', color: 'bg-purple-500' }, { icon: 'fa-sun', color: 'bg-yellow-500' }, { icon: 'fa-bolt', color: 'bg-blue-500' },
+            { icon: 'fa-snowflake', color: 'bg-cyan-400' }, { icon: 'fa-cloud-moon', color: 'bg-indigo-500' }, { icon: 'fa-poo-storm', color: 'bg-amber-700' },
+            { icon: 'fa-cat', color: 'bg-orange-400' }, { icon: 'fa-robot', color: 'bg-gray-500' }
         ];
-
         const weatherTypes = {
-            0: { icon: 'fa-sun', name: 'Despejado' },
-            1: { icon: 'fa-cloud-sun', name: 'Mayormente Claro' },
-            2: { icon: 'fa-cloud-sun', name: 'Parcialmente Nublado' },
-            3: { icon: 'fa-cloud', name: 'Nublado' },
-            45: { icon: 'fa-smog', name: 'Niebla' },
-            51: { icon: 'fa-cloud-rain', name: 'Llovizna' },
-            61: { icon: 'fa-cloud-showers-heavy', name: 'Lluvia' },
-            80: { icon: 'fa-cloud-showers-water', name: 'Chubascos' },
-            95: { icon: 'fa-bolt', name: 'Tormenta' }
+            0: { icon: 'fa-sun', name: 'Despejado' }, 1: { icon: 'fa-cloud-sun', name: 'Mayormente Claro' }, 2: { icon: 'fa-cloud-sun', name: 'Parcialmente Nublado' },
+            3: { icon: 'fa-cloud', name: 'Nublado' }, 45: { icon: 'fa-smog', name: 'Niebla' }, 51: { icon: 'fa-cloud-rain', name: 'Llovizna' },
+            61: { icon: 'fa-cloud-showers-heavy', name: 'Lluvia' }, 80: { icon: 'fa-cloud-showers-water', name: 'Chubascos' }, 95: { icon: 'fa-bolt', name: 'Tormenta' }
         };
 
-        // HELPERS UI
-        function setText(id, text) {
-            const el = document.getElementById(id);
-            if(el) el.innerText = text;
-        }
+        function setText(id, text) { const el = document.getElementById(id); if(el) el.innerText = text; }
+        function showToast(message) { const t = document.getElementById('customToast'); if(t) { document.getElementById('toastMessage').innerText = message; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }}
+        function toggleSkeleton(show) { document.querySelectorAll('.skeleton-target').forEach(el => el.classList.toggle('skeleton', show)); }
+        function triggerHaptic() { if(navigator.vibrate) navigator.vibrate(15); }
+        
+        // NUEVA LOGICA v4.2: Toggle Detalles
+        function toggleDetails() {
+            const hiddenItems = document.querySelectorAll('.extra-detail');
+            const btnText = document.getElementById('detailsBtnText');
+            const btnArrow = document.getElementById('detailsBtnArrow');
+            let isExpanding = false;
 
-        function showToast(message) {
-            const toast = document.getElementById('customToast');
-            if(toast) {
-                const msgEl = document.getElementById('toastMessage');
-                if(msgEl) msgEl.innerText = message;
-                toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 3000);
-            }
-        }
-
-        function toggleSkeleton(show) {
-            document.querySelectorAll('.skeleton-target').forEach(el => {
-                el.classList.toggle('skeleton', show);
+            hiddenItems.forEach(item => {
+                if(item.classList.contains('hidden')) {
+                    item.classList.remove('hidden');
+                    isExpanding = true;
+                } else {
+                    item.classList.add('hidden');
+                    isExpanding = false;
+                }
             });
-        }
 
-        function setupHeaderScroll() {
-            const scrollArea = document.getElementById('swipeArea');
-            const header = document.getElementById('mainHeader');
-            
-            if(scrollArea && header) {
-                scrollArea.addEventListener('scroll', () => {
-                    if (scrollArea.scrollTop > 50) {
-                        header.classList.add('header-scrolled');
-                    } else {
-                        header.classList.remove('header-scrolled');
-                    }
-                });
+            if(isExpanding) {
+                btnText.innerText = "Ver menos detalles";
+                btnArrow.classList.add('rotate-180');
+            } else {
+                btnText.innerText = "Ver más detalles";
+                btnArrow.classList.remove('rotate-180');
             }
         }
 
-        // INIT
+        function triggerBounceAnimation() { const c=document.getElementById('mainContainer'); if(c){ c.classList.remove('animate-bounce-x'); void c.offsetWidth; c.classList.add('animate-bounce-x'); setTimeout(()=>c.classList.remove('animate-bounce-x'),3000); }}
+        function cToF(c) { return (c * 9/5) + 32; }
+        function fToC(f) { return (f - 32) * 5/9; }
+        function kmToMph(k) { return k / 1.60934; }
+        function formatTemp(val) { if(val===undefined||val===null)return '--'; return (currentUnits==='imperial'?Math.round(cToF(val)):Math.round(val))+"°"; }
+        function formatSpeed(val) { if(val===undefined||val===null)return '--'; return (currentUnits==='imperial'?Math.round(kmToMph(val))+" mph":val+" km/h"); }
+        
+        function toggleUnits(mode) { currentUnits = mode; localStorage.setItem('atmosUnits', mode); updateUnitButtons(); if(globalData && currentCityData) updateUI(globalData, currentCityData.name); }
+        function selectCreateUnit(mode, btn) { tempUnitSelection = mode; triggerHaptic(); document.querySelectorAll('.unit-select-btn').forEach(b => { b.classList.remove('border-white/20','bg-white/10'); b.classList.add('border-transparent'); }); btn.classList.remove('border-transparent'); btn.classList.add('border-white/20','bg-white/10'); }
+        
+        function updateUnitButtons() {
+            const m = document.getElementById('unitMetricBtn'), i = document.getElementById('unitImperialBtn');
+            if(m && i) {
+                if(currentUnits === 'metric') { m.className = "px-3 py-1 rounded text-[10px] font-bold transition bg-white text-black"; i.className = "px-3 py-1 rounded text-[10px] font-bold transition opacity-50 hover:opacity-100"; }
+                else { i.className = "px-3 py-1 rounded text-[10px] font-bold transition bg-white text-black"; m.className = "px-3 py-1 rounded text-[10px] font-bold transition opacity-50 hover:opacity-100"; }
+            }
+        }
+
         window.onload = () => {
             checkOnboarding();
             loadFavorites();
@@ -526,612 +593,185 @@
             generateAvatarGrid();
             toggleSkeleton(true);
             setupSwipe();
-            setupHeaderScroll();
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        homeLocation = { lat: pos.coords.latitude, lon: pos.coords.longitude, name: "Ubicación Actual" };
-                        loadView(0);
-                    },
-                    () => { loadView(0); }
-                );
-            } else {
-                loadView(0);
-            }
-
-            const searchInput = document.getElementById('searchInput');
-            if(searchInput) {
-                searchInput.addEventListener('input', (e) => {
-                    const query = e.target.value.trim();
-                    clearTimeout(searchTimeout);
-                    if(query.length < 3) {
-                        const suggestionsList = document.getElementById('suggestionsList');
-                        if(suggestionsList) suggestionsList.classList.add('hidden');
-                        return;
-                    }
-                    searchTimeout = setTimeout(() => { fetchSuggestions(query); }, 300);
+            
+            const scrollArea = document.getElementById('swipeArea');
+            const header = document.getElementById('mainHeader');
+            if(scrollArea && header) {
+                scrollArea.addEventListener('scroll', () => {
+                    if (scrollArea.scrollTop > 50) header.classList.add('header-scrolled');
+                    else header.classList.remove('header-scrolled');
                 });
             }
-
-            const rainAlertToggle = document.getElementById('rainAlertToggle');
-            if(rainAlertToggle) {
-                rainAlertToggle.checked = localStorage.getItem('rainAlertActive') === 'true';
-            }
+            updateUnitButtons();
+            
+            if (navigator.geolocation) { navigator.geolocation.getCurrentPosition((pos) => { homeLocation = { lat: pos.coords.latitude, lon: pos.coords.longitude, name: "Ubicación Actual" }; loadView(0); }, () => loadView(0)); } else loadView(0);
+            
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                const q = e.target.value.trim();
+                clearTimeout(searchTimeout);
+                if(q.length<3) { document.getElementById('suggestionsList').classList.add('hidden'); return; }
+                searchTimeout = setTimeout(() => fetchSuggestions(q), 300);
+            });
+            document.getElementById('rainAlertToggle').checked = localStorage.getItem('rainAlertActive') === 'true';
         };
 
-        // --- NAVIGATION & SWIPE LOGIC ---
-        function loadView(index) {
-            currentViewIndex = index;
-            let target;
-            if (index === 0) target = homeLocation;
-            else target = favorites[index - 1];
-            
-            fetchData(target.lat, target.lon, target.name);
-            updatePaginationDots();
-        }
-
+        function loadView(index) { currentViewIndex = index; let t = (index===0)?homeLocation:favorites[index-1]; fetchData(t.lat, t.lon, t.name); updatePaginationDots(); }
         function updatePaginationDots() {
-            const container = document.getElementById('paginationDots');
-            if(!container) return;
-            container.innerHTML = '';
-            const totalPages = 1 + favorites.length;
-            
-            for(let i=0; i<totalPages; i++) {
-                const dot = document.createElement('div');
-                dot.className = `dot ${i === currentViewIndex ? 'active' : ''}`;
-                container.appendChild(dot);
-            }
+            const c = document.getElementById('paginationDots'); if(!c)return; c.innerHTML = '';
+            for(let i=0; i<1+favorites.length; i++) { const d=document.createElement('div'); d.className=`dot ${i===currentViewIndex?'active':''}`; c.appendChild(d); }
         }
-
         function setupSwipe() {
-            const swipeArea = document.getElementById('swipeArea');
-            if(!swipeArea) return;
-            let touchStartX = 0;
-            let touchEndX = 0;
-            swipeArea.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; });
-            swipeArea.addEventListener('touchend', e => {
-                touchEndX = e.changedTouches[0].screenX;
-                handleSwipe();
-            });
-            function handleSwipe() {
-                const threshold = 50;
-                const totalPages = 1 + favorites.length;
-                if (touchEndX < touchStartX - threshold) {
-                    if (currentViewIndex < totalPages - 1) loadView(currentViewIndex + 1);
-                } else if (touchEndX > touchStartX + threshold) {
-                    if (currentViewIndex > 0) loadView(currentViewIndex - 1);
-                }
-            }
+            const sa = document.getElementById('swipeArea'); if(!sa)return; let sx=0, ex=0;
+            sa.addEventListener('touchstart', e => sx = e.changedTouches[0].screenX);
+            sa.addEventListener('touchend', e => { ex = e.changedTouches[0].screenX; if (ex < sx - 50 && currentViewIndex < favorites.length) loadView(currentViewIndex + 1); else if (ex > sx + 50 && currentViewIndex > 0) loadView(currentViewIndex - 1); });
         }
 
-        // --- ONBOARDING & PROFILE LOGIC ---
-        function checkOnboarding() {
-            if (!localStorage.getItem('atmos_launched')) {
-                openProfileModal(); 
-            }
-        }
-
+        function checkOnboarding() { if (!localStorage.getItem('atmos_launched')) openProfileModal(); }
         function openProfileModal() {
-            const modal = document.getElementById('profileModal');
-            const createDiv = document.getElementById('profileCreateState');
-            const viewDiv = document.getElementById('profileViewState');
-            
-            if(!modal || !createDiv || !viewDiv) return;
-
+            const m=document.getElementById('profileModal'), c=document.getElementById('profileCreateState'), v=document.getElementById('profileViewState');
+            if(!m||!c||!v)return;
             if (userProfile && localStorage.getItem('atmos_launched')) {
-                // MODO VER
-                createDiv.classList.add('hidden');
-                createDiv.classList.remove('block');
-                
-                viewDiv.classList.remove('hidden');
-                viewDiv.classList.add('flex');
-                
-                // Llenar datos
-                const avatarObj = avatars.find(a => a.icon === userProfile.avatar) || avatars[0];
-                const vAv = document.getElementById('viewAvatar');
-                if(vAv) {
-                    vAv.className = `w-24 h-24 rounded-full mb-4 flex items-center justify-center text-4xl shadow-2xl border-4 border-white/20 ${avatarObj.color} backdrop-blur-md`;
-                    vAv.innerHTML = `<i class="fas ${avatarObj.icon} text-white"></i>`;
-                }
-                setText('viewName', userProfile.name);
-
+                c.classList.add('hidden'); c.classList.remove('block'); v.classList.remove('hidden'); v.classList.add('flex');
+                const av = avatars.find(a => a.icon === userProfile.avatar) || avatars[0];
+                document.getElementById('viewAvatar').innerHTML = `<i class="fas ${av.icon} text-white"></i>`;
+                document.getElementById('viewAvatar').className = `w-24 h-24 rounded-full mb-4 flex items-center justify-center text-4xl shadow-2xl border-4 border-white/20 ${av.color} backdrop-blur-md`;
+                setText('viewName', userProfile.name); updateUnitButtons();
             } else {
-                // MODO CREAR
-                viewDiv.classList.add('hidden');
-                viewDiv.classList.remove('flex');
-                
-                createDiv.classList.remove('hidden');
-                createDiv.classList.add('block');
-                
-                const nameInput = document.getElementById('profileNameInput');
-                if(userProfile && nameInput) nameInput.value = userProfile.name;
+                v.classList.add('hidden'); v.classList.remove('flex'); c.classList.remove('hidden'); c.classList.add('block');
+                if(userProfile) document.getElementById('profileNameInput').value = userProfile.name;
             }
-
-            modal.classList.remove('modal-closed');
-            modal.classList.add('modal-open');
-            toggleSidePanel(true); 
+            m.classList.remove('modal-closed'); m.classList.add('modal-open'); toggleSidePanel(true);
         }
-
-        function enableEditMode() {
-            const viewDiv = document.getElementById('profileViewState');
-            const createDiv = document.getElementById('profileCreateState');
-            if(viewDiv && createDiv) {
-                viewDiv.classList.add('hidden');
-                viewDiv.classList.remove('flex');
-                createDiv.classList.remove('hidden');
-                createDiv.classList.add('block');
-                if(userProfile) {
-                    const nameInput = document.getElementById('profileNameInput');
-                    if(nameInput) nameInput.value = userProfile.name;
-                }
-            }
-        }
-
+        function enableEditMode() { document.getElementById('profileViewState').classList.add('hidden'); document.getElementById('profileViewState').classList.remove('flex'); document.getElementById('profileCreateState').classList.remove('hidden'); document.getElementById('profileCreateState').classList.add('block'); }
         function loadProfileUI() {
             if(userProfile) {
-                const avatarObj = avatars.find(a => a.icon === userProfile.avatar) || avatars[0];
-                const headerDisplay = document.getElementById('headerAvatarDisplay');
-                if(headerDisplay) {
-                    headerDisplay.className = `w-10 h-10 rounded-full flex items-center justify-center text-lg shadow-lg border border-white/30 ${avatarObj.color}`;
-                    headerDisplay.innerHTML = `<i class="fas ${avatarObj.icon} text-white drop-shadow-sm"></i>`;
-                }
+                const av = avatars.find(a => a.icon === userProfile.avatar) || avatars[0];
+                const hd = document.getElementById('headerAvatarDisplay');
+                if(hd) { hd.className = `w-10 h-10 rounded-full flex items-center justify-center text-lg shadow-lg border border-white/30 ${av.color}`; hd.innerHTML = `<i class="fas ${av.icon} text-white drop-shadow-sm"></i>`; }
             }
         }
-
         function generateAvatarGrid() {
-            const grid = document.getElementById('avatarGrid');
-            if(!grid) return;
-            grid.innerHTML = '';
-            avatars.forEach(av => {
-                const btn = document.createElement('button');
-                btn.className = `avatar-option w-12 h-12 rounded-full flex items-center justify-center text-white transition border-2 border-transparent ${av.color}`;
-                btn.innerHTML = `<i class="fas ${av.icon}"></i>`;
-                btn.onclick = () => selectAvatar(av.icon, btn);
-                grid.appendChild(btn);
-            });
+            const g = document.getElementById('avatarGrid'); if(!g)return; g.innerHTML='';
+            avatars.forEach(av => { const b=document.createElement('button'); b.className=`avatar-option w-12 h-12 rounded-full flex items-center justify-center text-white transition border-2 border-transparent ${av.color}`; b.innerHTML=`<i class="fas ${av.icon}"></i>`; b.onclick=()=>{triggerHaptic();selectAvatar(av.icon,b)}; g.appendChild(b); });
         }
-
-        function selectAvatar(icon, btnElement) {
-            selectedAvatarIcon = icon;
-            document.querySelectorAll('.avatar-option').forEach(b => b.classList.remove('avatar-selected'));
-            btnElement.classList.add('avatar-selected');
-        }
-
+        function selectAvatar(i, b) { selectedAvatarIcon = i; document.querySelectorAll('.avatar-option').forEach(x=>x.classList.remove('avatar-selected')); b.classList.add('avatar-selected'); }
         function saveProfile() {
-            const nameInput = document.getElementById('profileNameInput');
-            if(!nameInput) return;
-            const name = nameInput.value.trim();
-            if(!name) return;
-            
-            userProfile = { name: name, avatar: selectedAvatarIcon };
-            localStorage.setItem('atmosProfile', JSON.stringify(userProfile));
-            localStorage.setItem('atmos_launched', 'true'); 
-            loadProfileUI();
-            closeModal('profileModal');
+            const n = document.getElementById('profileNameInput').value.trim(); if(!n)return;
+            currentUnits = tempUnitSelection; localStorage.setItem('atmosUnits', currentUnits);
+            userProfile = { name: n, avatar: selectedAvatarIcon }; localStorage.setItem('atmosProfile', JSON.stringify(userProfile)); localStorage.setItem('atmos_launched', 'true');
+            loadProfileUI(); updateUnitButtons(); if(globalData) updateUI(globalData, currentCityData.name);
+            closeModal('profileModal'); setTimeout(triggerBounceAnimation, 500);
         }
 
-        // --- SIDE PANEL ---
-        function toggleSidePanel(forceClose = false) { 
-            const panel = document.getElementById('sidePanel');
-            if(!panel) return;
-            if(forceClose) panel.classList.remove('translate-x-0');
-            else panel.classList.toggle('translate-x-0'); 
+        function toggleSidePanel(close=false) { const p=document.getElementById('sidePanel'); if(p) { if(close)p.classList.remove('translate-x-0'); else p.classList.toggle('translate-x-0'); }}
+        async function fetchSuggestions(q) { try { const r=await fetch(`${API_GEO}?name=${q}&count=5&language=es&format=json`); const d=await r.json(); const l=document.getElementById('suggestionsList'); l.innerHTML=''; if(d.results){ d.results.forEach(c=>{ const x=document.createElement('div'); x.className="p-3 hover:bg-white/10 cursor-pointer flex justify-between items-center border-b border-white/5 last:border-0 transition text-sm"; x.innerHTML=`<div><span class="font-bold block">${c.name}</span><span class="text-[10px] opacity-50 block uppercase">${c.country}</span></div>`; x.onclick=()=>{triggerHaptic();selectSuggestion(c)}; l.appendChild(x); }); l.classList.remove('hidden'); } else l.classList.add('hidden'); } catch(e){console.error(e);} }
+        function selectSuggestion(c) { homeLocation={lat:c.latitude,lon:c.longitude,name:c.name}; document.getElementById('searchInput').value=''; document.getElementById('suggestionsList').classList.add('hidden'); toggleSidePanel(true); loadView(0); }
+        async function searchCity() { const q=document.getElementById('searchInput').value; if(q) fetchSuggestions(q).then(()=>{const f=document.querySelector('#suggestionsList > div');if(f)f.click()}); }
+
+        function addToFavorites() { if(!currentCityData)return; if(!favorites.some(f=>f.name===currentCityData.name)){ favorites.push(currentCityData); localStorage.setItem('weatherFavs', JSON.stringify(favorites)); loadFavorites(); updatePaginationDots(); } showToast("Ubicación guardada"); }
+        function loadFavorites() { const l=document.getElementById('favoritesList'); if(!l)return; l.innerHTML=''; if(favorites.length===0){l.innerHTML='<p class="text-xs opacity-30 text-center py-2">Sin favoritos</p>';return;} favorites.forEach((f,i)=>{ l.innerHTML+=`<div onclick="triggerHaptic();loadView(${i+1});toggleSidePanel(true);" class="bg-white/5 p-3 rounded-xl flex justify-between items-center cursor-pointer hover:bg-white/10 w-full border border-white/5 transition"><span class="font-bold text-sm">${f.name}</span><button onclick="event.stopPropagation();triggerHaptic();removeFav(${i})" class="text-white/30 hover:text-red-400"><i class="fas fa-trash"></i></button></div>`; }); }
+        function removeFav(i) { favorites.splice(i,1); localStorage.setItem('weatherFavs',JSON.stringify(favorites)); loadFavorites(); updatePaginationDots(); if(currentViewIndex===i+1)loadView(0); else if(currentViewIndex>i+1)currentViewIndex--; }
+
+        function openMap(t) {
+            const m=document.getElementById('mapModal'), f=document.getElementById('windyFrame'), l=document.getElementById('mapLoader'); if(!m)return;
+            l.style.display='flex'; const lat=currentCityData?currentCityData.lat:40.4165, lon=currentCityData?currentCityData.lon:-3.7026;
+            const ut=currentUnits==='imperial'?'%C2%B0F':'%C2%B0C', uw=currentUnits==='imperial'?'mph':'km%2Fh';
+            f.src=`https://embed.windy.com/embed2.html?lat=${lat}&lon=${lon}&detailLat=${lat}&detailLon=${lon}&width=650&height=450&zoom=5&level=surface&overlay=${t}&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=${uw}&metricTemp=${ut}&radarRange=-1`;
+            f.onload=()=>{l.style.display='none'}; m.classList.remove('translate-y-full');
+        }
+        function closeMap(){ const m=document.getElementById('mapModal'); if(m)m.classList.add('translate-y-full'); }
+
+        async function fetchData(lat,lon,name) {
+            toggleSkeleton(true); try {
+                const wURL = `${API_WEATHER}?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,is_day,weather_code,wind_speed_10m,wind_direction_10m,visibility,precipitation_probability,precipitation,pressure_msl,dew_point_2m&hourly=temperature_2m,weather_code,is_day,precipitation_probability,apparent_temperature,relative_humidity_2m,wind_speed_10m,pressure_msl&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,precipitation_probability_max,precipitation_sum&forecast_days=14&timezone=auto`;
+                const aURL = `${API_AIR}?latitude=${lat}&longitude=${lon}&current=european_aqi`;
+                const [wR, aR] = await Promise.all([fetch(wURL), fetch(aURL)]);
+                const wD = await wR.json(), aD = await aR.json();
+                globalData={...wD, aqi:aD.current?aD.current.european_aqi:null}; currentCityData={name:name||"Ubicación", lat, lon}; updateUI(globalData, currentCityData.name);
+            } catch(e){ console.error(e); toggleSkeleton(false); }
         }
 
-        // --- SEARCH API ---
-        async function fetchSuggestions(query) {
-            try {
-                const res = await fetch(`${API_GEO}?name=${query}&count=5&language=es&format=json`);
-                const data = await res.json();
-                const list = document.getElementById('suggestionsList');
-                if(!list) return;
-                list.innerHTML = '';
-                if(data.results) {
-                    data.results.forEach(city => {
-                        const div = document.createElement('div');
-                        div.className = "p-3 hover:bg-white/10 cursor-pointer flex justify-between items-center border-b border-white/5 last:border-0 transition text-sm";
-                        div.innerHTML = `<div><span class="font-bold block">${city.name}</span><span class="text-[10px] opacity-50 block uppercase">${city.country}</span></div>`;
-                        div.onclick = () => selectSuggestion(city);
-                        list.appendChild(div);
-                    });
-                    list.classList.remove('hidden');
-                } else { list.classList.add('hidden'); }
-            } catch(e) { console.error(e); }
+        function updateUI(d, name) {
+            toggleSkeleton(false); const c=d.current, dy=d.daily; setText('cityName', name);
+            const ts=c.time.split('T')[1].split(':'); setText('localTime', `${ts[0]}:${ts[1]}`);
+            
+            const now=new Date(c.time).getTime(), rise=new Date(dy.sunrise[0]).getTime(), set=new Date(dy.sunset[0]).getTime(), m=45*60000;
+            let bg='bg-night', day=false;
+            if(now>=rise-m && now<=rise+m) { bg='bg-sunrise'; day=true; }
+            else if(now>=set-m && now<=set+m) { bg='bg-sunset'; day=true; }
+            else if(now>rise+m && now<set-m) { day=true; const x=c.weather_code; if(x>=95||(x>=61&&x<=65))bg='bg-storm'; else if(x>=61)bg='bg-rainy'; else if(x>=3)bg='bg-cloudy'; else bg='bg-day'; }
+            document.body.className = `${bg} relative noselect`; 
+            if(['bg-day','bg-sunny','bg-cloudy'].includes(bg)) document.body.classList.add('high-contrast-mode'); else document.body.classList.remove('high-contrast-mode');
+
+            setText('currentTemp', formatTemp(c.temperature_2m)); setText('minTemp', formatTemp(dy.temperature_2m_min[0])); setText('maxTemp', formatTemp(dy.temperature_2m_max[0]));
+            setText('windSpeed', formatSpeed(c.wind_speed_10m));
+            const wa=document.getElementById('windDirArrow'); if(wa) wa.style.transform=`rotate(${c.wind_direction_10m}deg)`;
+            setText('humidity', c.relative_humidity_2m+"%"); setText('rainProb', dy.precipitation_probability_max[0]+"%"); setText('uvDisplay', Math.round(dy.uv_index_max[0]));
+            
+            let vis=c.visibility, vT=""; if(currentUnits==='imperial') vT=(vis/1609.34).toFixed(1)+" mi"; else vT=(vis/1000).toFixed(1)+" km";
+            setText('pressureDisplay', Math.round(c.pressure_msl)+" hPa"); setText('dewPointDisplay', formatTemp(c.dew_point_2m)); setText('visibilityDisplay', vT);
+
+            const aqi=d.aqi; setText('aqiDisplay', aqi!==null?aqi:"--");
+            const aqI=document.getElementById('aqiIcon'); if(aqI){ aqI.className="fas fa-lungs mb-2 opacity-80 text-lg"; if(aqi!==null){ if(aqi<20)aqI.classList.add('text-green-300'); else if(aqi<50)aqI.classList.add('text-yellow-300'); else aqI.classList.add('text-red-300'); }}
+
+            let st="--:--", sl="Sol"; 
+            if(now<rise){st=new Date(rise).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});sl="Amanecer";}
+            else if(now<set){st=new Date(set).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});sl="Atardecer";}
+            else {st=new Date(dy.sunrise[1]).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});sl="Amanecer";}
+            setText('sunTime', st); setText('sunLabel', sl);
+
+            const info=weatherTypes[c.weather_code]||weatherTypes[0]; setText('weatherDesc', info.name);
+            const ic=day?info.icon:(c.weather_code===0?'fa-moon':info.icon);
+            document.getElementById('mainIcon').innerHTML=`<i class="fas ${ic} text-white drop-shadow-md"></i>`;
+
+            updateAIAdvisor(c.weather_code, c.temperature_2m, dy.precipitation_probability_max[0]);
+            renderChart(d.hourly); renderHourly(d.hourly); renderDaily(d.daily);
         }
 
-        function selectSuggestion(city) {
-            homeLocation = { lat: city.latitude, lon: city.longitude, name: city.name };
-            const searchInput = document.getElementById('searchInput');
-            if(searchInput) searchInput.value = '';
-            const list = document.getElementById('suggestionsList');
-            if(list) list.classList.add('hidden');
-            toggleSidePanel(true); 
-            loadView(0); 
+        function updateAIAdvisor(code, t, rain) {
+            const a=document.getElementById('aiAdvisor'); if(!a)return;
+            let m=""; if(code>=95)m="Tormenta inminente. Busca refugio."; else if(rain>70)m="Lleva paraguas, va a llover."; else if(t>30)m="Usa protector solar e hidrátate."; else if(t<5)m="Abrígate bien, hace frío."; else if(t<15)m="Lleva una chaqueta ligera."; else if(code===0)m="Día perfecto para salir."; else m="Condiciones estables.";
+            if(userProfile&&userProfile.name) m=`${m}`;
+            a.innerText=m; a.classList.remove('opacity-0');
         }
 
-        async function searchCity() {
-            const searchInput = document.getElementById('searchInput');
-            if(!searchInput) return;
-            const query = searchInput.value;
-            if(!query) return;
-            fetchSuggestions(query).then(() => {
-                const first = document.querySelector('#suggestionsList > div');
-                if(first) first.click();
-            });
-        }
-
-        // --- FAVORITES ---
-        function addToFavorites() {
-            if(!currentCityData) return;
-            if(!favorites.some(f => f.name === currentCityData.name)) {
-                favorites.push(currentCityData);
-                localStorage.setItem('weatherFavs', JSON.stringify(favorites));
-                loadFavorites();
-                updatePaginationDots();
-            }
-            showToast("Ubicación guardada");
-        }
-        
-        function loadFavorites() {
-            const list = document.getElementById('favoritesList');
-            if(!list) return;
-            list.innerHTML = '';
-            if(favorites.length === 0) {
-                list.innerHTML = '<p class="text-xs opacity-30 text-center py-2">Sin favoritos</p>';
-                return;
-            }
-            favorites.forEach((fav, index) => {
-                list.innerHTML += `
-                    <div onclick="loadView(${index + 1}); toggleSidePanel(true);" class="bg-white/5 p-3 rounded-xl flex justify-between items-center cursor-pointer hover:bg-white/10 w-full border border-white/5 transition">
-                        <span class="font-bold text-sm">${fav.name}</span>
-                        <button onclick="event.stopPropagation(); removeFav(${index})" class="text-white/30 hover:text-red-400"><i class="fas fa-trash"></i></button>
-                    </div>
-                `;
-            });
-        }
-
-        function removeFav(index) {
-            favorites.splice(index, 1);
-            localStorage.setItem('weatherFavs', JSON.stringify(favorites));
-            loadFavorites();
-            updatePaginationDots();
-            if (currentViewIndex === index + 1) loadView(0);
-            else if (currentViewIndex > index + 1) currentViewIndex--;
-        }
-
-        // --- MAPS ---
-        function openMap(type) {
-            const modal = document.getElementById('mapModal');
-            const iframe = document.getElementById('windyFrame');
-            const loader = document.getElementById('mapLoader');
-            
-            if(!modal || !iframe || !loader) return;
-            
-            let overlay = type; 
-            
-            const lat = currentCityData ? currentCityData.lat : 40.4165;
-            const lon = currentCityData ? currentCityData.lon : -3.7026;
-            
-            loader.style.display = 'flex';
-            iframe.src = `https://embed.windy.com/embed2.html?lat=${lat}&lon=${lon}&detailLat=${lat}&detailLon=${lon}&width=650&height=450&zoom=5&level=surface&overlay=${overlay}&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1`;
-            
-            iframe.onload = () => { loader.style.display = 'none'; };
-            modal.classList.remove('translate-y-full');
-        }
-
-        function closeMap() {
-            const modal = document.getElementById('mapModal');
-            if(modal) modal.classList.add('translate-y-full');
-        }
-
-        // --- WEATHER DATA & UI ---
-        async function fetchData(lat, lon, cityNameOverride = null) {
-            toggleSkeleton(true);
-            try {
-                let displayName = cityNameOverride || "Ubicación";
-                const weatherUrl = `${API_WEATHER}?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,is_day,weather_code,wind_speed_10m,wind_direction_10m,visibility,precipitation_probability,precipitation&hourly=temperature_2m,weather_code,is_day,precipitation_probability,apparent_temperature,relative_humidity_2m,wind_speed_10m,pressure_msl&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,precipitation_probability_max,precipitation_sum&forecast_days=14&timezone=auto`;
-                const airUrl = `${API_AIR}?latitude=${lat}&longitude=${lon}&current=european_aqi`;
-
-                const [weatherRes, airRes] = await Promise.all([fetch(weatherUrl), fetch(airUrl)]);
-                const weatherData = await weatherRes.json();
-                const airData = await airRes.json();
-
-                globalData = { ...weatherData, aqi: airData.current ? airData.current.european_aqi : null };
-                currentCityData = { name: displayName, lat, lon };
-                updateUI(globalData, displayName);
-            } catch (error) { console.error("Error API", error); toggleSkeleton(false); }
-        }
-
-        function updateUI(data, cityName) {
-            toggleSkeleton(false);
-            const current = data.current;
-            const daily = data.daily;
-            
-            setText('cityName', cityName);
-            
-            // Hora
-            const locationTimeStr = current.time; 
-            const locationDate = new Date(locationTimeStr);
-            const timeParts = locationTimeStr.split('T')[1].split(':');
-            setText('localTime', `${timeParts[0]}:${timeParts[1]}`);
-
-            // Lógica Fondo
-            const sunriseDate = new Date(daily.sunrise[0]);
-            const sunsetDate = new Date(daily.sunset[0]);
-            const nowTs = locationDate.getTime();
-            const sunriseTs = sunriseDate.getTime();
-            const sunsetTs = sunsetDate.getTime();
-            const margin = 45 * 60 * 1000; 
-
-            let bgClass = 'bg-night';
-            let isDay = false;
-
-            if (nowTs >= sunriseTs - margin && nowTs <= sunriseTs + margin) {
-                bgClass = 'bg-sunrise';
-                isDay = true;
-            } else if (nowTs >= sunsetTs - margin && nowTs <= sunsetTs + margin) {
-                bgClass = 'bg-sunset';
-                isDay = true;
-            } else if (nowTs > sunriseTs + margin && nowTs < sunsetTs - margin) {
-                isDay = true;
-                const code = current.weather_code;
-                if (code >= 95 || (code >= 61 && code <= 65)) bgClass = 'bg-storm';
-                else if (code >= 61) bgClass = 'bg-rainy';
-                else if (code >= 3) bgClass = 'bg-cloudy';
-                else bgClass = 'bg-day'; 
-            } else {
-                isDay = false;
-                bgClass = 'bg-night';
-            }
-            document.body.className = `${bgClass}`; 
-
-            // Datos usando la función segura setText
-            setText('currentTemp', Math.round(current.temperature_2m) + "°");
-            setText('minTemp', Math.round(daily.temperature_2m_min[0]) + "°");
-            setText('maxTemp', Math.round(daily.temperature_2m_max[0]) + "°");
-            setText('windSpeed', current.wind_speed_10m + " km/h");
-            
-            const windArrow = document.getElementById('windDirArrow');
-            if(windArrow) windArrow.style.transform = `rotate(${current.wind_direction_10m}deg)`;
-
-            setText('humidity', current.relative_humidity_2m + "%");
-            setText('rainProb', daily.precipitation_probability_max[0] + "%");
-            setText('uvDisplay', Math.round(daily.uv_index_max[0]));
-            
-            const aqi = data.aqi;
-            setText('aqiDisplay', aqi !== null ? aqi : "--");
-            
-            const aqiIcon = document.getElementById('aqiIcon');
-            if(aqiIcon) {
-                aqiIcon.className = "fas fa-lungs mb-2 opacity-80 text-lg";
-                if(aqi !== null) {
-                    if(aqi < 20) aqiIcon.classList.add('text-green-300');
-                    else if(aqi < 50) aqiIcon.classList.add('text-yellow-300');
-                    else aqiIcon.classList.add('text-red-300');
-                }
-            }
-
-            // Sol Logic
-            let sunTimeStr = "--:--";
-            let sunLabel = "Sol";
-            const sunriseTimeStr = sunriseDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            const sunsetTimeStr = sunsetDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
-            if (nowTs < sunriseTs) { sunTimeStr = sunriseTimeStr; sunLabel = "Amanecer"; } 
-            else if (nowTs < sunsetTs) { sunTimeStr = sunsetTimeStr; sunLabel = "Atardecer"; } 
-            else {
-                 const sunriseTomorrow = new Date(daily.sunrise[1]);
-                 sunTimeStr = sunriseTomorrow.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                 sunLabel = "Amanecer";
-            }
-            setText('sunTime', sunTimeStr);
-            setText('sunLabel', sunLabel);
-
-            const code = current.weather_code;
-            const info = weatherTypes[code] || weatherTypes[0];
-            setText('weatherDesc', info.name);
-            
-            const iconClass = isDay ? info.icon : (code === 0 ? 'fa-moon' : info.icon);
-            const mainIcon = document.getElementById('mainIcon');
-            if(mainIcon) mainIcon.innerHTML = `<i class="fas ${iconClass} text-white drop-shadow-md"></i>`;
-
-            renderChart(data.hourly);
-            renderHourly(data.hourly);
-            renderDaily(data.daily);
-        }
-
-        function renderChart(hourly) {
-            const ctxEl = document.getElementById('tempChart');
-            if(!ctxEl) return;
-            const ctx = ctxEl.getContext('2d');
-            
-            if (tempChartInstance) tempChartInstance.destroy();
-
-            const currentHourIndex = new Date().getHours();
-            const labels = [];
-            const dataPoints = [];
-            
-            for(let i = currentHourIndex; i < currentHourIndex + 24; i+=3) {
-                if (!hourly.time[i]) break;
-                labels.push(hourly.time[i].split('T')[1].substring(0, 5));
-                dataPoints.push(Math.round(hourly.temperature_2m[i]));
-            }
-
-            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-            gradient.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
-            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-
+        function renderChart(h) {
+            const cv=document.getElementById('tempChart'); if(!cv)return; const ctx=cv.getContext('2d');
+            if(tempChartInstance)tempChartInstance.destroy();
+            const cur=new Date().getHours(), lbs=[], dts=[];
+            for(let i=cur; i<cur+24; i+=3){ if(!h.time[i])break; lbs.push(h.time[i].split('T')[1].substring(0,5)); let v=h.temperature_2m[i]; if(currentUnits==='imperial')v=cToF(v); dts.push(Math.round(v)); }
+            const gr=ctx.createLinearGradient(0,0,0,400); gr.addColorStop(0,'rgba(255,255,255,0.5)'); gr.addColorStop(1,'rgba(255,255,255,0)');
             tempChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Temp',
-                        data: dataPoints,
-                        borderColor: '#fff',
-                        backgroundColor: gradient,
-                        borderWidth: 3,
-                        pointBackgroundColor: '#fff',
-                        pointRadius: 0,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
-                    scales: { 
-                        x: { display: true, grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.8)', font: { size: 9, weight: 'bold' } } }, 
-                        y: { display: false } 
-                    }
-                }
+                type:'line', data:{ labels:lbs, datasets:[{ label:'Temp', data:dts, borderColor:'#fff', backgroundColor:gr, borderWidth:3, pointBackgroundColor:'#fff', pointRadius:3, fill:true, tension:0.4 }] },
+                options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{enabled:true, backgroundColor:'rgba(0,0,0,0.8)', titleFont:{family:'Outfit'}, bodyFont:{family:'Outfit',weight:'bold'}, padding:10, displayColors:false, callbacks:{label:c=>c.parsed.y+(currentUnits==='imperial'?'°F':'°C')}}}, scales:{x:{display:true,grid:{display:false},ticks:{color:'rgba(255,255,255,0.8)',font:{size:9,weight:'bold'}}},y:{display:false}}}
             });
         }
 
-        function renderHourly(hourly) {
-            const container = document.getElementById('hourlyForecast');
-            if(!container) return;
-            container.innerHTML = '';
-            const currentHourIndex = new Date().getHours();
-            for(let i = currentHourIndex; i < currentHourIndex + 24; i++) {
-                if (!hourly.time[i]) break;
-                const temp = Math.round(hourly.temperature_2m[i]);
-                const hCode = hourly.weather_code[i];
-                const hIcon = (weatherTypes[hCode] || weatherTypes[0]).icon;
-                const timeStr = hourly.time[i].split('T')[1].substring(0, 5); 
-                container.innerHTML += `
-                    <div onclick="openHourlyModal(${i})" class="flex flex-col items-center justify-center min-w-[60px] snap-center cursor-pointer opacity-90 hover:opacity-100 transition text-shadow">
-                        <span class="text-[10px] opacity-80 mb-2 font-bold">${timeStr}</span>
-                        <i class="fas ${hIcon} text-lg mb-2 drop-shadow-sm"></i>
-                        <span class="font-bold text-sm">${temp}°</span>
-                    </div>
-                `;
-            }
+        function renderHourly(h) {
+            const c=document.getElementById('hourlyForecast'); if(!c)return; c.innerHTML=''; const cur=new Date().getHours();
+            for(let i=cur; i<cur+24; i++){ if(!h.time[i])break; const t=formatTemp(h.temperature_2m[i]), ic=(weatherTypes[h.weather_code[i]]||weatherTypes[0]).icon, ts=h.time[i].split('T')[1].substring(0,5); c.innerHTML+=`<div onclick="triggerHaptic();openHourlyModal(${i})" class="flex flex-col items-center justify-center min-w-[60px] snap-center cursor-pointer opacity-90 hover:opacity-100 transition text-shadow"><span class="text-[10px] opacity-80 mb-2 font-bold">${ts}</span><i class="fas ${ic} text-lg mb-2 drop-shadow-sm"></i><span class="font-bold text-sm">${t}</span></div>`; }
         }
-
-        function renderDaily(daily) {
-            const container7 = document.getElementById('dailyForecast');
-            if(!container7) return;
-            container7.innerHTML = '';
-            const container14 = document.getElementById('extendedForecast');
-            if(container14) container14.innerHTML = '';
-
-            for(let i = 0; i < 7; i++) {
-                const date = new Date(daily.time[i]);
-                let dayName;
-                if (i === 0) dayName = 'Hoy';
-                else if (i === 1) dayName = 'Mañana';
-                else {
-                    dayName = date.toLocaleDateString('es-ES', { weekday: 'short' });
-                }
-                const dCode = daily.weather_code[i];
-                const dIcon = (weatherTypes[dCode] || weatherTypes[0]).icon;
-                const max = Math.round(daily.temperature_2m_max[i]);
-                const min = Math.round(daily.temperature_2m_min[i]);
-
-                container7.innerHTML += `
-                    <div onclick="openDailyModal(${i})" class="grid grid-cols-[2fr,1fr,1fr] items-center p-3 hover:bg-white/10 transition cursor-pointer border-b border-white/5 last:border-0">
-                        <div class="flex items-center gap-3">
-                             <span class="uppercase font-bold text-xs opacity-90 w-12 text-shadow">${dayName}</span>
-                             <i class="fas ${dIcon} text-sm opacity-90 drop-shadow-sm"></i>
-                        </div>
-                        <div class="flex justify-end gap-4 text-sm text-shadow">
-                            <span class="font-bold">${max}°</span>
-                            <span class="opacity-60 font-bold">${min}°</span>
-                        </div>
-                    </div>
-                `;
+        function renderDaily(d) {
+            const c7=document.getElementById('dailyForecast'), c14=document.getElementById('extendedForecast'); if(!c7)return; c7.innerHTML=''; if(c14)c14.innerHTML='';
+            for(let i=0; i<7; i++){
+                const dt=new Date(d.time[i]), ic=(weatherTypes[d.weather_code[i]]||weatherTypes[0]).icon, max=formatTemp(d.temperature_2m_max[i]), min=formatTemp(d.temperature_2m_min[i]);
+                let dn=(i===0)?'Hoy':(i===1?'Mañana':dt.toLocaleDateString('es-ES',{weekday:'short'}));
+                c7.innerHTML+=`<div onclick="triggerHaptic();openDailyModal(${i})" class="grid grid-cols-[2fr,1fr,1fr] items-center p-3 hover:bg-white/10 transition cursor-pointer border-b border-white/5 last:border-0"><div class="flex items-center gap-3"><span class="uppercase font-bold text-xs opacity-90 w-12 text-shadow">${dn}</span><i class="fas ${ic} text-sm opacity-90 drop-shadow-sm"></i></div><div class="flex justify-end gap-4 text-sm text-shadow"><span class="font-bold">${max}</span><span class="opacity-60 font-bold">${min}</span></div></div>`;
             }
-            // Extended Forecast (simulado para 14 días)
-            if (daily.time.length >= 14 && container14) {
-                for(let i = 7; i < 14; i++) {
-                    const date = new Date(daily.time[i]);
-                    const dayName = date.toLocaleDateString('es-ES', { month:'numeric', day:'numeric' });
-                    const dCode = daily.weather_code[i];
-                    const dIcon = (weatherTypes[dCode] || weatherTypes[0]).icon;
-                    const max = Math.round(daily.temperature_2m_max[i]);
-                    const min = Math.round(daily.temperature_2m_min[i]);
-                    container14.innerHTML += `
-                         <div onclick="openDailyModal(${i})" class="grid grid-cols-[2fr,1fr,1fr] items-center p-2 hover:bg-white/5 transition cursor-pointer text-xs">
-                            <div class="flex items-center gap-3">
-                                 <span class="opacity-60 w-8">${dayName}</span>
-                                 <i class="fas ${dIcon} opacity-50"></i>
-                            </div>
-                            <div class="flex justify-end gap-4">
-                                <span class="font-bold">${max}°</span>
-                                <span class="opacity-40">${min}°</span>
-                            </div>
-                        </div>
-                    `;
+            if(d.time.length>=14 && c14) {
+                for(let i=7; i<14; i++){
+                    const dt=new Date(d.time[i]), ic=(weatherTypes[d.weather_code[i]]||weatherTypes[0]).icon, max=formatTemp(d.temperature_2m_max[i]), min=formatTemp(d.temperature_2m_min[i]), dn=dt.toLocaleDateString('es-ES',{month:'numeric',day:'numeric'});
+                    c14.innerHTML+=`<div onclick="triggerHaptic();openDailyModal(${i})" class="grid grid-cols-[2fr,1fr,1fr] items-center p-2 hover:bg-white/5 transition cursor-pointer text-xs"><div class="flex items-center gap-3"><span class="opacity-60 w-8">${dn}</span><i class="fas ${ic} opacity-50"></i></div><div class="flex justify-end gap-4"><span class="font-bold">${max}</span><span class="opacity-40">${min}</span></div></div>`;
                 }
             }
         }
 
-        // Funciones Faltantes Restauradas
-        function openHourlyModal(index) {
-             const h = globalData.hourly;
-             const time = h.time[index].split('T')[1];
-             const html = `<h3 class="text-4xl font-bold mb-2">${time}</h3><p class="text-6xl font-light mb-4">${Math.round(h.temperature_2m[index])}°</p>
-             <div class="grid grid-cols-2 gap-4 text-left text-sm bg-white/10 p-4 rounded-xl">
-                <div><span class="opacity-50">Viento</span> <br><b>${h.wind_speed_10m[index]} km/h</b></div>
-                <div><span class="opacity-50">Lluvia</span> <br><b>${h.precipitation_probability[index]}%</b></div>
-             </div>`;
-             showModal('detailModal', html);
-        }
-        
-        function openDailyModal(index) {
-             const d = globalData.daily;
-             const date = new Date(d.time[index]).toLocaleDateString('es-ES', {weekday:'long', day:'numeric'});
-             const html = `<h3 class="text-xl font-bold mb-4 capitalize">${date}</h3>
-             <div class="flex justify-center gap-6 text-4xl mb-6"><span class="font-bold">${Math.round(d.temperature_2m_max[index])}°</span><span class="opacity-50">${Math.round(d.temperature_2m_min[index])}°</span></div>
-             <div class="grid grid-cols-2 gap-4 text-left text-sm bg-white/10 p-4 rounded-xl">
-                <div><span class="opacity-50">UV Max</span> <br><b>${d.uv_index_max[index]}</b></div>
-                <div><span class="opacity-50">Lluvia</span> <br><b>${d.precipitation_probability_max[index]}%</b></div>
-             </div>`;
-             showModal('detailModal', html);
-        }
+        function openHourlyModal(i) { const h=globalData.hourly, t=h.time[i].split('T')[1], tmp=formatTemp(h.temperature_2m[i]), sp=formatSpeed(h.wind_speed_10m[i]); showModal('detailModal', `<h3 class="text-4xl font-bold mb-2">${t}</h3><p class="text-6xl font-light mb-4">${tmp}</p><div class="grid grid-cols-2 gap-4 text-left text-sm bg-white/10 p-4 rounded-xl"><div><span class="opacity-50">Viento</span> <br><b>${sp}</b></div><div><span class="opacity-50">Lluvia</span> <br><b>${h.precipitation_probability[i]}%</b></div></div>`); }
+        function openDailyModal(i) { const d=globalData.daily, dt=new Date(d.time[i]).toLocaleDateString('es-ES',{weekday:'long',day:'numeric'}), max=formatTemp(d.temperature_2m_max[i]), min=formatTemp(d.temperature_2m_min[i]); showModal('detailModal', `<h3 class="text-xl font-bold mb-4 capitalize">${dt}</h3><div class="flex justify-center gap-6 text-4xl mb-6"><span class="font-bold">${max}</span><span class="opacity-50">${min}</span></div><div class="grid grid-cols-2 gap-4 text-left text-sm bg-white/10 p-4 rounded-xl"><div><span class="opacity-50">UV Max</span> <br><b>${d.uv_index_max[i]}</b></div><div><span class="opacity-50">Lluvia</span> <br><b>${d.precipitation_probability_max[i]}%</b></div></div>`); }
 
-        function showModal(id, content) {
-            if(content) {
-                const contentEl = document.getElementById('modalContent');
-                if(contentEl) contentEl.innerHTML = content;
-            }
-            const modal = document.getElementById(id);
-            if(modal) {
-                modal.classList.remove('modal-closed');
-                modal.classList.add('modal-open');
-            }
-        }
-        
-        function closeModal(id) {
-            const modal = document.getElementById(id);
-            if(modal) {
-                modal.classList.remove('modal-open');
-                modal.classList.add('modal-closed');
-            }
-        }
-        
-        function toggleRainAlert() {
-            const chk = document.getElementById('rainAlertToggle');
-            if(chk) {
-                localStorage.setItem('rainAlertActive', chk.checked);
-                showToast(chk.checked ? "Alertas Activadas" : "Alertas Desactivadas");
-            }
-        }
-        
-        function toggleExtendedForecast() {
-             const c = document.getElementById('extendedForecastContainer');
-             const a = document.getElementById('extendedArrow');
-             if(c && a) {
-                 c.classList.toggle('open');
-                 a.classList.toggle('rotate-180');
-             }
-        }
+        function showModal(id,c) { if(c)document.getElementById('modalContent').innerHTML=c; document.getElementById(id).classList.remove('modal-closed'); document.getElementById(id).classList.add('modal-open'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('modal-open'); document.getElementById(id).classList.add('modal-closed'); }
+        function toggleExtendedForecast() { const c=document.getElementById('extendedForecastContainer'), a=document.getElementById('extendedArrow'); if(c&&a){c.classList.toggle('open'); a.classList.toggle('rotate-180');} }
     </script>
 </body>
 </html>
-
-
-
