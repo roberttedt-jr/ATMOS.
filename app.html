@@ -3,13 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Atmos.</title>
+    <title>Atmos | Ultra Pro</title>
     
     <!-- PWA Settings -->
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="icon" href="https://github.com/roberttedt-jr/ATMOS./blob/main/atmos-icon.png" type="image/png">
+    <meta name="apple-mobile-web-app-title" content="Atmos">
+    
+    <!-- --- CORRECCIÓN DE ICONOS PARA IPHONE --- -->
+    <!-- Esta es la línea que faltaba y causaba que se viera la "A" negra -->
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1163/1163661.png">
+    <!-- Icono estándar para el resto -->
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1163/1163661.png" type="image/png">
 
     <!-- Librerías -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -206,8 +212,7 @@
     <!-- CONTENEDOR PRINCIPAL -->
     <div id="mainContainer" class="w-full h-full relative overflow-hidden flex flex-col z-10 text-center">
         
-        <!-- HEADER DINÁMICO (LOGO Y AVATAR) - REDUCIDO ESPACIO -->
-        <!-- h-24 reducido a h-20 y padding ajustado para subir elementos -->
+        <!-- HEADER DINÁMICO -->
         <div id="mainHeader" class="absolute top-0 left-0 w-full z-30 pt-6 pb-2 px-6 flex justify-between items-center pointer-events-none h-20">
             <div class="text-left transition-transform duration-300 origin-left" id="headerLogoContainer">
                 <h1 class="font-extrabold tracking-widest text-xl text-white drop-shadow-lg leading-none">ATMOS.</h1>
@@ -247,7 +252,6 @@
         </div>
 
         <!-- CONTENIDO PRINCIPAL -->
-        <!-- Padding superior reducido (pt-20) para subir todo el contenido -->
         <div id="swipeArea" class="h-full w-full overflow-y-auto hide-scroll pt-20 pb-32 px-0 fade-mask-top relative z-0">
             <div class="flex flex-col items-center justify-center mb-10 text-center px-4 w-full pt-4">
                 <div class="mb-2">
@@ -367,7 +371,7 @@
             </button>
         </div>
 
-        <!-- MODALES - FONDO AJUSTADO A TRANSLÚCIDO (GLASS REAL) -->
+        <!-- MODALES -->
         <div id="detailModal" class="absolute inset-0 z-[60] flex items-center justify-center p-6 modal modal-closed bg-black/30 backdrop-blur-xl transition-all duration-500">
             <div class="bg-gray-900/70 border border-white/10 text-white w-full max-w-sm rounded-3xl p-8 shadow-2xl relative flex flex-col items-center text-center backdrop-blur-md">
                 <button onclick="closeModal('detailModal')" class="absolute top-5 right-5 w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition"><i class="fas fa-times text-sm"></i></button>
@@ -378,8 +382,6 @@
         <div id="profileModal" class="absolute inset-0 z-[70] flex items-center justify-center p-6 modal modal-closed bg-black/30 backdrop-blur-xl transition-all duration-500">
             <div class="bg-gray-900/70 border border-white/10 text-white w-full max-w-sm rounded-3xl p-8 shadow-2xl relative flex flex-col text-center backdrop-blur-md">
                 <button onclick="closeModal('profileModal')" class="absolute top-4 right-4 w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition"><i class="fas fa-times text-sm"></i></button>
-                
-                <!-- ESTADO 1: CREAR PERFIL -->
                 <div id="profileCreateState" class="hidden">
                     <div class="mb-6 flex justify-center">
                         <div class="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center text-black text-2xl shadow-lg shadow-yellow-400/20">
@@ -395,13 +397,10 @@
                         Comenzar
                     </button>
                 </div>
-
-                <!-- ESTADO 2: VISUALIZAR PERFIL (MINIMALISTA) -->
                 <div id="profileViewState" class="hidden flex-col items-center justify-center py-4">
                     <div id="viewAvatar" class="w-24 h-24 rounded-full bg-gray-800/50 mb-4 flex items-center justify-center text-4xl shadow-2xl border-2 border-white/20 backdrop-blur-md"></div>
                     <h2 id="viewName" class="text-3xl font-bold mb-1">Usuario</h2>
                     <p class="text-sm opacity-50 mb-8 uppercase tracking-widest">Miembro Atmos</p>
-                    
                     <div class="flex gap-3 w-full">
                          <button onclick="enableEditMode()" class="flex-1 py-3 bg-white/10 rounded-xl text-sm font-bold hover:bg-white/20 transition">
                              <i class="fas fa-pen mr-2"></i> Editar
@@ -411,7 +410,6 @@
                          </button>
                     </div>
                 </div>
-
             </div>
         </div>
 
@@ -491,9 +489,12 @@
 
         function showToast(message) {
             const toast = document.getElementById('customToast');
-            document.getElementById('toastMessage').innerText = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+            if(toast) {
+                const msgEl = document.getElementById('toastMessage');
+                if(msgEl) msgEl.innerText = message;
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3000);
+            }
         }
 
         function toggleSkeleton(show) {
@@ -506,13 +507,15 @@
             const scrollArea = document.getElementById('swipeArea');
             const header = document.getElementById('mainHeader');
             
-            scrollArea.addEventListener('scroll', () => {
-                if (scrollArea.scrollTop > 50) {
-                    header.classList.add('header-scrolled');
-                } else {
-                    header.classList.remove('header-scrolled');
-                }
-            });
+            if(scrollArea && header) {
+                scrollArea.addEventListener('scroll', () => {
+                    if (scrollArea.scrollTop > 50) {
+                        header.classList.add('header-scrolled');
+                    } else {
+                        header.classList.remove('header-scrolled');
+                    }
+                });
+            }
         }
 
         // INIT
@@ -537,17 +540,24 @@
                 loadView(0);
             }
 
-            document.getElementById('searchInput').addEventListener('input', (e) => {
-                const query = e.target.value.trim();
-                clearTimeout(searchTimeout);
-                if(query.length < 3) {
-                    document.getElementById('suggestionsList').classList.add('hidden');
-                    return;
-                }
-                searchTimeout = setTimeout(() => { fetchSuggestions(query); }, 300);
-            });
+            const searchInput = document.getElementById('searchInput');
+            if(searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const query = e.target.value.trim();
+                    clearTimeout(searchTimeout);
+                    if(query.length < 3) {
+                        const suggestionsList = document.getElementById('suggestionsList');
+                        if(suggestionsList) suggestionsList.classList.add('hidden');
+                        return;
+                    }
+                    searchTimeout = setTimeout(() => { fetchSuggestions(query); }, 300);
+                });
+            }
 
-            document.getElementById('rainAlertToggle').checked = localStorage.getItem('rainAlertActive') === 'true';
+            const rainAlertToggle = document.getElementById('rainAlertToggle');
+            if(rainAlertToggle) {
+                rainAlertToggle.checked = localStorage.getItem('rainAlertActive') === 'true';
+            }
         };
 
         // --- NAVIGATION & SWIPE LOGIC ---
@@ -563,6 +573,7 @@
 
         function updatePaginationDots() {
             const container = document.getElementById('paginationDots');
+            if(!container) return;
             container.innerHTML = '';
             const totalPages = 1 + favorites.length;
             
@@ -575,6 +586,7 @@
 
         function setupSwipe() {
             const swipeArea = document.getElementById('swipeArea');
+            if(!swipeArea) return;
             let touchStartX = 0;
             let touchEndX = 0;
             swipeArea.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; });
@@ -605,6 +617,8 @@
             const createDiv = document.getElementById('profileCreateState');
             const viewDiv = document.getElementById('profileViewState');
             
+            if(!modal || !createDiv || !viewDiv) return;
+
             if (userProfile && localStorage.getItem('atmos_launched')) {
                 // MODO VER
                 createDiv.classList.add('hidden');
@@ -616,9 +630,11 @@
                 // Llenar datos
                 const avatarObj = avatars.find(a => a.icon === userProfile.avatar) || avatars[0];
                 const vAv = document.getElementById('viewAvatar');
-                vAv.className = `w-24 h-24 rounded-full mb-4 flex items-center justify-center text-4xl shadow-2xl border-4 border-white/20 ${avatarObj.color} backdrop-blur-md`;
-                vAv.innerHTML = `<i class="fas ${avatarObj.icon} text-white"></i>`;
-                document.getElementById('viewName').innerText = userProfile.name;
+                if(vAv) {
+                    vAv.className = `w-24 h-24 rounded-full mb-4 flex items-center justify-center text-4xl shadow-2xl border-4 border-white/20 ${avatarObj.color} backdrop-blur-md`;
+                    vAv.innerHTML = `<i class="fas ${avatarObj.icon} text-white"></i>`;
+                }
+                setText('viewName', userProfile.name);
 
             } else {
                 // MODO CREAR
@@ -628,7 +644,8 @@
                 createDiv.classList.remove('hidden');
                 createDiv.classList.add('block');
                 
-                if(userProfile) document.getElementById('profileNameInput').value = userProfile.name;
+                const nameInput = document.getElementById('profileNameInput');
+                if(userProfile && nameInput) nameInput.value = userProfile.name;
             }
 
             modal.classList.remove('modal-closed');
@@ -637,11 +654,18 @@
         }
 
         function enableEditMode() {
-            document.getElementById('profileViewState').classList.add('hidden');
-            document.getElementById('profileViewState').classList.remove('flex');
-            document.getElementById('profileCreateState').classList.remove('hidden');
-            document.getElementById('profileCreateState').classList.add('block');
-            if(userProfile) document.getElementById('profileNameInput').value = userProfile.name;
+            const viewDiv = document.getElementById('profileViewState');
+            const createDiv = document.getElementById('profileCreateState');
+            if(viewDiv && createDiv) {
+                viewDiv.classList.add('hidden');
+                viewDiv.classList.remove('flex');
+                createDiv.classList.remove('hidden');
+                createDiv.classList.add('block');
+                if(userProfile) {
+                    const nameInput = document.getElementById('profileNameInput');
+                    if(nameInput) nameInput.value = userProfile.name;
+                }
+            }
         }
 
         function loadProfileUI() {
@@ -657,6 +681,7 @@
 
         function generateAvatarGrid() {
             const grid = document.getElementById('avatarGrid');
+            if(!grid) return;
             grid.innerHTML = '';
             avatars.forEach(av => {
                 const btn = document.createElement('button');
@@ -674,8 +699,11 @@
         }
 
         function saveProfile() {
-            const name = document.getElementById('profileNameInput').value.trim();
+            const nameInput = document.getElementById('profileNameInput');
+            if(!nameInput) return;
+            const name = nameInput.value.trim();
             if(!name) return;
+            
             userProfile = { name: name, avatar: selectedAvatarIcon };
             localStorage.setItem('atmosProfile', JSON.stringify(userProfile));
             localStorage.setItem('atmos_launched', 'true'); 
@@ -686,6 +714,7 @@
         // --- SIDE PANEL ---
         function toggleSidePanel(forceClose = false) { 
             const panel = document.getElementById('sidePanel');
+            if(!panel) return;
             if(forceClose) panel.classList.remove('translate-x-0');
             else panel.classList.toggle('translate-x-0'); 
         }
@@ -696,6 +725,7 @@
                 const res = await fetch(`${API_GEO}?name=${query}&count=5&language=es&format=json`);
                 const data = await res.json();
                 const list = document.getElementById('suggestionsList');
+                if(!list) return;
                 list.innerHTML = '';
                 if(data.results) {
                     data.results.forEach(city => {
@@ -712,14 +742,18 @@
 
         function selectSuggestion(city) {
             homeLocation = { lat: city.latitude, lon: city.longitude, name: city.name };
-            document.getElementById('searchInput').value = '';
-            document.getElementById('suggestionsList').classList.add('hidden');
+            const searchInput = document.getElementById('searchInput');
+            if(searchInput) searchInput.value = '';
+            const list = document.getElementById('suggestionsList');
+            if(list) list.classList.add('hidden');
             toggleSidePanel(true); 
             loadView(0); 
         }
 
         async function searchCity() {
-            const query = document.getElementById('searchInput').value;
+            const searchInput = document.getElementById('searchInput');
+            if(!searchInput) return;
+            const query = searchInput.value;
             if(!query) return;
             fetchSuggestions(query).then(() => {
                 const first = document.querySelector('#suggestionsList > div');
@@ -741,6 +775,7 @@
         
         function loadFavorites() {
             const list = document.getElementById('favoritesList');
+            if(!list) return;
             list.innerHTML = '';
             if(favorites.length === 0) {
                 list.innerHTML = '<p class="text-xs opacity-30 text-center py-2">Sin favoritos</p>';
@@ -771,6 +806,8 @@
             const iframe = document.getElementById('windyFrame');
             const loader = document.getElementById('mapLoader');
             
+            if(!modal || !iframe || !loader) return;
+            
             let overlay = type; 
             
             const lat = currentCityData ? currentCityData.lat : 40.4165;
@@ -784,7 +821,8 @@
         }
 
         function closeMap() {
-            document.getElementById('mapModal').classList.add('translate-y-full');
+            const modal = document.getElementById('mapModal');
+            if(modal) modal.classList.add('translate-y-full');
         }
 
         // --- WEATHER DATA & UI ---
@@ -848,7 +886,7 @@
             }
             document.body.className = `${bgClass}`; 
 
-            // Datos
+            // Datos usando la función segura setText
             setText('currentTemp', Math.round(current.temperature_2m) + "°");
             setText('minTemp', Math.round(daily.temperature_2m_min[0]) + "°");
             setText('maxTemp', Math.round(daily.temperature_2m_max[0]) + "°");
@@ -874,7 +912,7 @@
                 }
             }
 
-            // Sol
+            // Sol Logic
             let sunTimeStr = "--:--";
             let sunLabel = "Sol";
             const sunriseTimeStr = sunriseDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
@@ -1094,5 +1132,3 @@
     </script>
 </body>
 </html>
-
-
