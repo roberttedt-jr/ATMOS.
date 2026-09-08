@@ -133,6 +133,6 @@ Abre en tu navegador [http://localhost:8000/app.html](http://localhost:8000/app.
 
 ## 📜 Licencia y Autor
 
-© 2026 **ATMOS.** Desarrollado por **Roberto Tedt** ([@roberttedt-jr](https://github.com/roberttedt-jr)).
+© 2026 **Atmos.**. Desarrollado y mantenido por [Roberto](https://github.com/roberttedt-jr).
 
 Distribuido bajo la licencia [MIT](LICENSE).
